@@ -1,0 +1,12 @@
+{
+  "name": "winston-dashboard-vue",
+  "version": "1.0.0",
+  "description": "Vue3 based winston log dashboard.",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "author": "Apisit Lee",
+  "license": "ISC"
+}
