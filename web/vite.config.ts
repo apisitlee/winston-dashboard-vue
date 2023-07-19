@@ -7,6 +7,7 @@ import { createStyleImportPlugin } from 'vite-plugin-style-import'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/winston-dashboard-vue/',
   plugins: [
     vue(),
     createStyleImportPlugin({
