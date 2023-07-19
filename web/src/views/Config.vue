@@ -95,7 +95,7 @@ onMounted(() => {
 
 async function loadLogConfigs() {
   try {
-    const res = await fetch("/api/logConfig/list");
+    const res = await fetch("/winston-dashboard-vue/api/logConfig/list");
     const { data = [] } = await res.json();
     logConfigs.value = data;
   } catch (e) {
@@ -122,7 +122,7 @@ function onClickDelete(row: any) {
     content: `确认删除日志配置 "${row.name}" 吗？`,
     onOk: async () => {
       try {
-        const res = await fetch(`/api/logConfig/delete`, {
+        const res = await fetch(`/winston-dashboard-vue/api/logConfig/delete`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
@@ -152,7 +152,9 @@ function onClickDelete(row: any) {
 
 async function submit() {
   try {
-    const url = form.value.timestamp ? "/api/logConfig/update" : "/api/logConfig/add";
+    const url = form.value.timestamp
+      ? "/winston-dashboard-vue/api/logConfig/update"
+      : "/winston-dashboard-vue/api/logConfig/add";
     const res = await fetch(url, {
       method: "POST",
       headers: {

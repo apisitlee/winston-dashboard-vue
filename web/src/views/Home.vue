@@ -125,7 +125,7 @@ const handleReset = () => {
 
 async function loadLogConfigs() {
   try {
-    const res = await fetch("/api/logConfig/list", {
+    const res = await fetch("/winston-dashboard-vue/api/logConfig/list", {
       method: "GET",
     });
     const data = await res.json();
@@ -151,7 +151,10 @@ async function loadData() {
       pageSize: pagination.value.pageSize,
       pageNo: pagination.value.pageNo,
     };
-    const requestUrl = new URL("/api/query", window.location.origin);
+    const requestUrl = new URL(
+      "/winston-dashboard-vue/api/query",
+      window.location.origin
+    );
     Object.keys(params).forEach((key) =>
       requestUrl.searchParams.append(key, params[key])
     );
@@ -191,14 +194,14 @@ async function loadData() {
 }
 
 async function getActive() {
-  const res = await fetch("/api/logConfig/active");
+  const res = await fetch("/winston-dashboard-vue/api/logConfig/active");
   const { data } = await res.json();
   active.value = data;
 }
 
 async function onChangeSource(ev: any) {
   try {
-    const res = await fetch("/api/logConfig/active", {
+    const res = await fetch("/winston-dashboard-vue/api/logConfig/active", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
