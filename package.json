@@ -5,7 +5,9 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "node test.js",
+    "start": "cd web && npm run build && cd .. && node prod.js",
+    "dev": "cd web && npm run build:dev && cd .. && node dev.js"
   },
   "author": "Apisit Lee",
   "license": "ISC"

@@ -1,13 +1,16 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite';
 import { ArcoResolver } from 'unplugin-vue-components/resolvers';
 import { createStyleImportPlugin } from 'vite-plugin-style-import'
 
+const env = loadEnv(process.env.NODE_ENV, process.cwd())
+console.log('env:\n', env)
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/winston-dashboard-vue/',
+  base: env.VITE_BASE_URL,
   plugins: [
     vue(),
     createStyleImportPlugin({

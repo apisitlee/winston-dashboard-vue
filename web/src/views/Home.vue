@@ -8,64 +8,93 @@
           </a-radio>
         </a-radio-group>
       </div>
-      <table class="log-table">
-        <thead>
-          <tr>
-            <th colspan="4" style="padding: 18px 0 0 0">
-              <a-form :model="form" layout="inline" size="small" @submit="handleSubmit">
-                <a-form-item field="s">
-                  <a-input v-model="form.s" placeholder="模糊搜索日志内容" allow-clear />
-                </a-form-item>
-                <a-form-item field="level">
-                  <a-select
-                    v-model="form.level"
-                    placeholder="日志等级"
-                    allow-clear
-                    style="width: 120px"
-                  >
-                    <a-option value="info">info</a-option>
-                    <a-option value="error">error</a-option>
-                  </a-select>
-                </a-form-item>
-                <a-form-item field="range">
-                  <a-range-picker
-                    v-model="form.range"
-                    show-time
-                    :time-picker-props="{ defaultValue: ['00:00:00', '23:59:59'] }"
-                    format="YYYY-MM-DD HH:mm"
-                    :placeholder="['开始时间', '结束时间']"
-                    allow-clear
-                  />
-                </a-form-item>
-                <a-form-item>
-                  <a-space>
-                    <a-button html-type="submit" type="primary" :loading="loading">
-                      查询
-                    </a-button>
-                    <a-button html-type="reset" @click="handleReset">重置</a-button>
-                  </a-space>
-                </a-form-item>
-              </a-form>
-            </th>
-          </tr>
-          <tr>
-            <th>#</th>
-            <th>日志等级</th>
-            <th>日志内容</th>
-            <th>记录时间</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(row, i) in tableData" :key="i">
-            <td class="col-index">{{ i + 1 }}</td>
-            <td class="col-level">
-              <span :class="row.level">{{ row.level }}</span>
-            </td>
-            <td>{{ row.message }}</td>
-            <td class="col-time">{{ row.timestamp }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="query-form">
+        <a-form :model="form" layout="inline" size="small" @submit="loadData">
+          <a-form-item field="s">
+            <a-input v-model="form.s" placeholder="模糊搜索日志内容" allow-clear />
+          </a-form-item>
+          <a-form-item field="level">
+            <a-select
+              v-model="form.level"
+              placeholder="日志等级"
+              allow-clear
+              style="width: 120px"
+            >
+              <a-option value="info">info</a-option>
+              <a-option value="error">error</a-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item field="range">
+            <a-range-picker
+              v-model="form.range"
+              format="YYYY-MM-DD"
+              :placeholder="['开始日期', '结束日期']"
+              allow-clear
+              style="width: 240px"
+            />
+          </a-form-item>
+          <a-form-item field="tag">
+            <a-input-group>
+              <a-select
+                v-model="form.tag[0]"
+                placeholder="标签名称"
+                clearable
+                style="width: 120px"
+              >
+                <a-option v-for="tag in tagsDef" :value="tag.slug">
+                  {{ tag.label }}
+                </a-option>
+              </a-select>
+              <a-input
+                v-model="form.tag[1]"
+                placeholder="标签值"
+                clearable
+                style="width: 120px"
+              />
+            </a-input-group>
+          </a-form-item>
+          <a-form-item>
+            <a-space>
+              <a-button html-type="submit" type="primary" :loading="loading">
+                查询
+              </a-button>
+              <a-button html-type="reset" @click="() => handleReset()"> 重置 </a-button>
+            </a-space>
+          </a-form-item>
+        </a-form>
+      </div>
+      <a-table
+        :data="tableData"
+        :columns="columns"
+        :pagination="false"
+        :loading="loading"
+        bordered
+        stripe
+        column-resizable
+      >
+        <template #_index="{ rowIndex }">{{ rowIndex + 1 }}</template>
+        <template #level="{ record }">
+          <span :class="record.level">{{ record.level }}</span>
+        </template>
+        <template #message="{ record }">
+          {{ JSON.stringify(record.message) }}
+        </template>
+        <template #tags="{ record, rowIndex }">
+          <a-space wrap>
+            <a-tag
+              v-for="(tag, ind) in Object.entries(record.tags || {})"
+              :key="`${rowIndex}-${ind}`"
+            >
+              {{ tagsMap[tag[0]] }}: {{ tag[1] }}
+            </a-tag>
+          </a-space>
+        </template>
+        <template #action="{ record, rowIndex }">
+          <a-button type="text" @click="() => onClickItem(record, rowIndex)">
+            详情
+          </a-button>
+        </template>
+      </a-table>
     </a-spin>
     <div class="log-table-foot" v-show="pagination.total !== 0">
       <a-pagination
@@ -80,15 +109,27 @@
       />
     </div>
   </div>
+  <DetailModal ref="detailModalRef" />
   <a-back-top />
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { Modal } from "@arco-design/web-vue";
+// @ts-ignore
+import DetailModal from "./components/DetailModal.vue";
+import dayjs from "dayjs";
 
 const logConfigs = ref<any>([]);
 const tableData = ref<any>([]);
+const columns = ref([
+  { title: "#", slotName: "_index", width: 80 },
+  { title: "日志等级", slotName: "level", width: 100 },
+  { title: "日志内容", slotName: "message" },
+  { title: "业务标签", slotName: "tags" },
+  { title: "记录时间", dataIndex: "timestamp", width: 180 },
+  { title: "操作", slotName: "action", width: 100 },
+]);
 const loading = ref(false);
 const pagination = ref({
   hasNext: false,
@@ -101,31 +142,33 @@ const pagination = ref({
 const form = ref({
   level: "",
   s: "",
-  range: [],
+  range: [dayjs().format("YYYY-MM-DD 00:00:00"), dayjs().format("YYYY-MM-DD 23:59:59")],
+  tag: [],
 });
 const active = ref("");
+const tagsDef = ref<any>([]);
+const tagsMap = ref<any>({});
+const detailModalRef = ref();
 
 onMounted(async () => {
   await getActive();
   await loadData();
+  setTagsByConfig();
 });
 
-const handleSubmit = () => {
-  loadData();
-};
-
-const handleReset = () => {
+function handleReset() {
   form.value = {
     s: "",
     level: "",
     range: [],
+    tag: [],
   };
   loadData();
-};
+}
 
 async function loadLogConfigs() {
   try {
-    const res = await fetch("/winston-dashboard-vue/api/logConfig/list", {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/logConfig/list`, {
       method: "GET",
     });
     const data = await res.json();
@@ -152,7 +195,7 @@ async function loadData() {
       pageNo: pagination.value.pageNo,
     };
     const requestUrl = new URL(
-      "/winston-dashboard-vue/api/query",
+      `${import.meta.env.VITE_BASE_URL}api/query`,
       window.location.origin
     );
     Object.keys(params).forEach((key) =>
@@ -194,14 +237,14 @@ async function loadData() {
 }
 
 async function getActive() {
-  const res = await fetch("/winston-dashboard-vue/api/logConfig/active");
+  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/logConfig/active`);
   const { data } = await res.json();
   active.value = data;
 }
 
 async function onChangeSource(ev: any) {
   try {
-    const res = await fetch("/winston-dashboard-vue/api/logConfig/active", {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/logConfig/active`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -214,6 +257,7 @@ async function onChangeSource(ev: any) {
     if (data.code) {
       throw data.msg;
     }
+    setTagsByConfig();
     await loadData();
   } catch (e) {
     console.error(e);
@@ -223,69 +267,33 @@ async function onChangeSource(ev: any) {
     });
   }
 }
+
+function setTagsByConfig() {
+  let list: any[] = [];
+  let map: Record<string, string> = {};
+  const config = logConfigs.value.find((conf: any) => conf.timestamp === active.value);
+  if (config) {
+    list = config.tags || [];
+    list.map((tag: any) => {
+      map[tag.slug] = tag.label;
+    });
+  }
+  tagsDef.value = list;
+  tagsMap.value = map;
+}
+
+function onClickItem(record: any, index: number) {
+  detailModalRef.value.visible = true;
+  detailModalRef.value.model = record;
+  detailModalRef.value.index = index;
+  detailModalRef.value.tagsMap = tagsMap.value;
+}
 </script>
 
 <style scoped>
-.log-table {
-  width: 100%;
-  border-collapse: collapse;
-  border-spacing: 0;
-  border: 1px solid #dddddd;
-  border-bottom: 0;
+.query-form {
+  margin: 12px 0 0 0;
 }
-
-.log-table thead {
-  background-color: #165dff;
-  background-color: #ffffff;
-  position: sticky;
-  top: -1px;
-  color: #d6e2ff;
-  color: #165dff;
-}
-
-.log-table thead::after {
-  content: "";
-  display: block;
-  clear: both;
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background-color: #165dff;
-  z-index: 10;
-}
-
-.log-table tbody tr:not(:last-child) {
-  border-bottom: 1px solid #dddddd;
-}
-
-.log-table th,
-.log-table td {
-  text-align: left;
-  padding: 16px;
-}
-
-.log-table tbody tr:nth-child(even) {
-  background-color: #f1f6ff;
-}
-
-.log-table tbody tr:hover {
-  background-color: #e9f0ff;
-}
-
-.col-index {
-  width: 60px;
-}
-
-.col-level {
-  width: 100px;
-}
-
-.col-time {
-  width: 160px;
-}
-
 .info {
   background-color: #e5edff;
   color: #165dff;

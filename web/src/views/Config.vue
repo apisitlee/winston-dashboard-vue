@@ -9,6 +9,13 @@
     stripe
     style="margin-top: 24px"
   >
+    <template #tags="{ record }">
+      <a-space>
+        <a-tag v-for="(tag, i) in record.tags || []" :key="i">
+          {{ tag.label }}: {{ tag.slug }}
+        </a-tag>
+      </a-space>
+    </template>
     <template #action="{ record }">
       <a-space>
         <a-button type="text" @click="() => onClickEdit(record)">编辑</a-button>
@@ -18,7 +25,13 @@
       </a-space>
     </template>
   </a-table>
-  <a-modal v-model:visible="visible" :title="title" @cancel="close" @ok="ok">
+  <a-modal
+    v-model:visible="visible"
+    :title="title"
+    width="680px"
+    @cancel="close"
+    @ok="ok"
+  >
     <a-form ref="formRef" :model="form" :rules="rules" @submit="submit">
       <a-form-item field="timestamp" label="时间戳" v-show="false">
         <a-input v-model="form.timestamp" />
@@ -32,6 +45,43 @@
       <a-form-item field="logFilename" label="日志文件名">
         <a-input v-model="form.logFilename" />
       </a-form-item>
+      <a-form-item field="tags" label="业务标签">
+        <div>
+          <a-table
+            :data="form.tags"
+            :columns="tagColumns"
+            :pagination="false"
+            :draggable="{ type: 'handle', width: 40 }"
+            style="width: 100%"
+            @change="handleTagTableChange"
+          >
+            <template #label="{ record }">
+              <a-input v-model="record.label" placeholder="标签名称" />
+            </template>
+            <template #slug="{ record }">
+              <a-input v-model="record.slug" placeholder="标签key" />
+            </template>
+            <template #action="{ rowIndex }">
+              <a-button
+                size="small"
+                type="text"
+                status="danger"
+                @click="() => onClickRemoveTag(rowIndex)"
+              >
+                <template #icon>
+                  <icon-minus-circle />
+                </template>
+              </a-button>
+            </template>
+          </a-table>
+          <a-button type="outline" style="margin-top: 12px" @click="onClickAddTag">
+            <template #icon>
+              <icon-plus />
+            </template>
+            <span>添加标签</span>
+          </a-button>
+        </div>
+      </a-form-item>
     </a-form>
   </a-modal>
 </template>
@@ -39,6 +89,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { Modal, Message } from "@arco-design/web-vue";
+import { IconPlus, IconMinusCircle } from "@arco-design/web-vue/es/icon";
 
 const logConfigs = ref<any>([]);
 const formRef = ref();
@@ -47,6 +98,7 @@ const form = ref<any>({
   name: "",
   logPath: "",
   logFilename: "",
+  tags: [{ label: "", slug: "" }],
 });
 const rules = ref({
   name: [
@@ -82,7 +134,28 @@ const columns = ref([
     dataIndex: "logFilename",
   },
   {
+    title: "业务标签",
+    dataIndex: "tags",
+    slotName: "tags",
+  },
+  {
     title: "操作",
+    slotName: "action",
+  },
+]);
+const tagColumns = ref([
+  {
+    title: "标签名称",
+    dataIndex: "label",
+    slotName: "label",
+  },
+  {
+    title: "标签键名",
+    dataIndex: "slug",
+    slotName: "slug",
+  },
+  {
+    title: "",
     slotName: "action",
   },
 ]);
@@ -95,7 +168,7 @@ onMounted(() => {
 
 async function loadLogConfigs() {
   try {
-    const res = await fetch("/winston-dashboard-vue/api/logConfig/list");
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/logConfig/list`);
     const { data = [] } = await res.json();
     logConfigs.value = data;
   } catch (e) {
@@ -122,7 +195,7 @@ function onClickDelete(row: any) {
     content: `确认删除日志配置 "${row.name}" 吗？`,
     onOk: async () => {
       try {
-        const res = await fetch(`/winston-dashboard-vue/api/logConfig/delete`, {
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/logConfig/delete`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
@@ -153,8 +226,8 @@ function onClickDelete(row: any) {
 async function submit() {
   try {
     const url = form.value.timestamp
-      ? "/winston-dashboard-vue/api/logConfig/update"
-      : "/winston-dashboard-vue/api/logConfig/add";
+      ? `${import.meta.env.VITE_BASE_URL}api/logConfig/update`
+      : `${import.meta.env.VITE_BASE_URL}api/logConfig/add`;
     const res = await fetch(url, {
       method: "POST",
       headers: {
@@ -188,5 +261,15 @@ async function ok() {
 function close() {
   visible.value = false;
   formRef.value.resetFields();
+}
+
+function onClickAddTag() {
+  form.value.tags.push({ label: "", slug: "" });
+}
+function onClickRemoveTag(index: number) {
+  form.value.tags.splice(index, 1);
+}
+function handleTagTableChange(_data: any) {
+  form.value.tags = _data;
 }
 </script>

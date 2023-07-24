@@ -7,7 +7,7 @@ import path from 'path';
 import fs from 'fs';
 import setupStorage from './utils/StorageUtils.js';
 
-export default function WinstonDashboardServer(config = {}) {
+export default async function WinstonDashboardServer(config = {}) {
 
     const port = config.port || 6688;
 
@@ -18,7 +18,7 @@ export default function WinstonDashboardServer(config = {}) {
     setupStorage();
 
     let list = [];
-    fileFinder((data) => {
+    const { flush } = await fileFinder((data) => {
         list = data;
     });
 
@@ -31,7 +31,8 @@ export default function WinstonDashboardServer(config = {}) {
     // 添加日志监控配置
     router.post('/api/logConfig/add', async ctx => {
         const { body } = ctx.request;
-        const { logPath, logFilename, name } = body || {};
+        const { logPath, logFilename, name, tags = [] } = body || {};
+        const tagStr = JSON.stringify(Array.from(tags));
         if (!logPath || !logFilename || !name) {
             ctx.body = {
                 code: 2,
@@ -41,7 +42,7 @@ export default function WinstonDashboardServer(config = {}) {
         }
         try {
             // 创建一条记录，格式：timestamp\tname\tlogPath\tlogFilename
-            const newRecord = `${new Date().getTime()}\t${name}\t${logPath}\t${logFilename}`;
+            const newRecord = `${new Date().getTime()}\t${name}\t${logPath}\t${logFilename}\t${tagStr}`;
             // 将记录添加在../storage.local/logs文件最后一行
             fs.appendFileSync(path.resolve(process.cwd(), 'server/storage.local/logs.txt'), newRecord + '\n');
             ctx.body = {
@@ -74,18 +75,19 @@ export default function WinstonDashboardServer(config = {}) {
                 encoding: 'utf8',
             }).trim();
             list = list.length ? list.split('\n').map((item) => {
-                const [timestamp, name, logPath, logFilename] = item.split('\t');
+                const [timestamp, name, logPath, logFilename, tagStr] = item.split('\t');
                 return {
                     timestamp,
                     name,
                     logPath,
                     logFilename,
+                    tagStr,
                 };
             }) : [];
             list = list.filter((row) => {
                 return row.timestamp !== timestamp;
             });
-            list = list.map((row) => `${row.timestamp}\t${row.name}\t${row.logPath}\t${row.logFilename}`).join('\n');
+            list = list.map((row) => `${row.timestamp}\t${row.name}\t${row.logPath}\t${row.logFilename}\t${row.tagStr}`).join('\n');
             // 覆写
             fs.writeFileSync(path.resolve(process.cwd(), 'server/storage.local/logs.txt'), list + '\n');
             ctx.body = {
@@ -104,7 +106,8 @@ export default function WinstonDashboardServer(config = {}) {
     // 修改日志监控配置
     router.post('/api/logConfig/update', async ctx => {
         const { body } = ctx.request;
-        const { timestamp, logPath, logFilename, name } = body || {};
+        const { timestamp, logPath, logFilename, name, tags = [] } = body || {};
+        const tagStr = JSON.stringify(Array.from(tags));
         if (!timestamp || !logPath || !logFilename || !name) {
             ctx.body = {
                 code: 2,
@@ -118,12 +121,13 @@ export default function WinstonDashboardServer(config = {}) {
                 encoding: 'utf8',
             }).trim();
             list = list.length ? list.split('\n').map((item) => {
-                const [timestamp, name, logPath, logFilename] = item.split('\t');
+                const [timestamp, name, logPath, logFilename, tagStr] = item.split('\t');
                 return {
                     timestamp,
                     name,
                     logPath,
                     logFilename,
+                    tagStr,
                 };
             }) : [];
             list = list.map((row) => {
@@ -132,12 +136,13 @@ export default function WinstonDashboardServer(config = {}) {
                         timestamp,
                         name,
                         logPath,
-                        logFilename
+                        logFilename,
+                        tagStr,
                     };
                 }
                 return row;
             });
-            list = list.map((row) => `${row.timestamp}\t${row.name}\t${row.logPath}\t${row.logFilename}`).join('\n');
+            list = list.map((row) => `${row.timestamp}\t${row.name}\t${row.logPath}\t${row.logFilename}\t${row.tagStr}`).join('\n');
             // 覆写
             fs.writeFileSync(path.resolve(process.cwd(), 'server/storage.local/logs.txt'), list + '\n');
             ctx.body = {
@@ -164,12 +169,13 @@ export default function WinstonDashboardServer(config = {}) {
                 code: 0,
                 msg: 'success',
                 data: list.length ? list.split('\n').map((item) => {
-                    const [timestamp, name, logPath, logFilename] = item.split('\t');
+                    const [timestamp, name, logPath, logFilename, tagStr = '[]'] = item.split('\t');
                     return {
                         timestamp,
                         name,
                         logPath,
                         logFilename,
+                        tags: JSON.parse(tagStr || '[]')
                     };
                 }) : [],
             };
@@ -200,7 +206,9 @@ export default function WinstonDashboardServer(config = {}) {
                 code: 0,
                 msg: '设置成功'
             };
+            flush();
         } catch (e) {
+            console.log(e);
             ctx.body = {
                 code: 1,
                 msg: '设置失败：\n' + JSON.stringify({error: e})
@@ -234,13 +242,15 @@ export default function WinstonDashboardServer(config = {}) {
     router.get('/api/query', async ctx => {
         const { query } = ctx.request;
         let { level, s, pageNo = 1, pageSize = 10, range = '' } = query || {};
-        console.log(range);
         pageNo = parseInt(pageNo);
         pageSize = parseInt(pageSize);
         let [startTime, endTime] = range.split(',');
         const result = list.filter(item => {
             if (level && item.level !== level) return false;
-            if (s && !item.message.includes(s)) return false;
+            if (s) {
+                if (typeof item.message === 'string' && !(item.message).includes(s)) return false;
+                if (!JSON.stringify(item.message).includes(s)) return false;
+            }
             if (startTime && endTime) {
                 const time = new Date(item.timestamp);
                 if (time < new Date(startTime) || time > new Date(endTime)) return false;
