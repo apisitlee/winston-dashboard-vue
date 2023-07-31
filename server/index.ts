@@ -25,8 +25,8 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
     });
 
     // 使用static托管web页面
-    console.log('web: ', path.resolve(__dirname, '../web/'));
-    app.use(serve(path.resolve(__dirname, '../web/')));
+    console.log('web: ', path.resolve(__dirname, '../../web/'));
+    app.use(serve(path.resolve(__dirname, '../../web/')));
 
     // 使用bodyParser
     app.use(bodyParser());
