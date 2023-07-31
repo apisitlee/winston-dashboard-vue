@@ -4,6 +4,12 @@
   "description": "Vue3 based winston log dashboard.",
   "type": "module",
   "main": "index.js",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./index.cjs"
+    }
+  },
   "files": [
     "output"
   ],

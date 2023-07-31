@@ -8,7 +8,7 @@ import fs from 'fs';
 import setupStorage from './utils/StorageUtils.js';
 import type { WinstonDashboardServerConfig } from './index.d.js';
 
-export default async function WinstonDashboardServer(config: WinstonDashboardServerConfig = {}) {
+export async function WinstonDashboardServer(config: WinstonDashboardServerConfig = {}) {
 
     const port = config.port || 6688;
 
