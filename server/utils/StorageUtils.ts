@@ -1,7 +1,17 @@
 import fs from 'fs';
 import path from 'path';
 
-export default function setupStorage({ storageDir }) {
+type Config = {
+    storageDir?: string
+}
+type Res = {
+    readStorage: (filename: string) => string
+    writeStorage: (filename: string, content: string) => void
+    appendStorage: (filename: string, content: string) => void
+}
+
+export default function setupStorage(config: Config): Res {
+    const { storageDir = 'storage.local' } = config || {}
     const dirExists = fs.existsSync(storageDir);
     if (!dirExists) {
         fs.mkdirSync(storageDir);
