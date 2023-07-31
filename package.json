@@ -2,7 +2,7 @@
   "name": "winston-dashboard-vue",
   "version": "1.0.4",
   "description": "Vue3 based winston log dashboard.",
-  "type": "module",
+  "type": "commonjs",
   "main": "index.js",
   "exports": {
     ".": {
@@ -19,7 +19,8 @@
     "test": "node test.js",
     "build:web": "cd web && yarn run build",
     "build:server": "cd server && yarn run build",
-    "build": "yarn run build:server && yarn run build:web && rm -rf ./output && mkdir output && mv server/lib output/server && mv web/dist output/web"
+    "build": "yarn run build:server && yarn run build:web && rm -rf ./output && mkdir output && mv server/lib output/server && mv web/dist output/web",
+    "publish:patch": "npm version patch && npm publish --tag beta"
   },
   "author": "Apisit Lee",
   "repository": {
