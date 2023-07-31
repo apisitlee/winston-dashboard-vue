@@ -1,6 +1,6 @@
 {
   "name": "winston-dashboard-vue",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Vue3 based winston log dashboard.",
   "type": "module",
   "main": "index.js",
