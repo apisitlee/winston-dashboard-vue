@@ -46,18 +46,14 @@ function streamReadFiles(config: any) {
         });
 }
 
-export async function fileFinder(onUpdate: any): Promise<any> {
+export async function fileFinder(readStorage: (filename: string) => string, onUpdate: any): Promise<any> {
     async function find(): Promise<any[]> {
         const list: any[] = [];
         // 读取../storage.local/active文件
-        const active = fs.readFileSync(path.resolve(process.cwd(), 'server/storage.local/active.txt'), {
-            encoding: 'utf8',
-        }).trim();
+        const active = readStorage('active.txt');
         if (active === '') return list;
         // 读取../storage.local/logs文件，获取所有日志源，筛选出当前日志源
-        const configs = fs.readFileSync(path.resolve(process.cwd(), 'server/storage.local/logs.txt'), {
-            encoding: 'utf8',
-        }).trim();
+        const configs = readStorage('logs.txt');
         const config = configs.split('\n').map((item) => {
             const [timestamp, name, logPath, logFilename] = item.split('\t');
             return {

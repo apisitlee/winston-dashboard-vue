@@ -20,7 +20,7 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
     });
 
     let list: any[] = [];
-    const { flush } = await fileFinder((data: any[]) => {
+    const { flush } = await fileFinder(readStorage, (data: any[]) => {
         list = data;
     });
 
