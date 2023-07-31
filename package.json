@@ -19,7 +19,7 @@
     "test": "node test.js",
     "build:web": "cd web && yarn run build",
     "build:server": "cd server && yarn run build",
-    "build": "yarn run build:server && yarn run build:web && rm -rf ./output && mkdir output && mv server/lib output/server && mv web/dist output/web",
+    "build": "yarn run build:server && yarn run build:web && rm -rf ./output && mkdir output && mv server/lib output/server && mv web/dist output/web/dist",
     "publish:patch": "npm version patch && npm publish --tag beta"
   },
   "author": "Apisit Lee",

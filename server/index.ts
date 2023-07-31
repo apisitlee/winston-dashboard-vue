@@ -25,6 +25,7 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
     });
 
     // 使用static托管web页面
+    console.log('服务cwd:', process.cwd());
     app.use(serve(process.cwd() + '/web/dist/'));
 
     // 使用bodyParser
