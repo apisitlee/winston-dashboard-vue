@@ -4,11 +4,23 @@
   "description": "Vue3 based winston log dashboard.",
   "type": "module",
   "main": "index.js",
+  "files": [
+    "output"
+  ],
   "scripts": {
     "test": "node test.js",
-    "start": "cd web && npm run build && cd .. && node prod.js",
-    "dev": "cd web && npm run build:dev && cd .. && node dev.js"
+    "build:web": "cd web && yarn run build",
+    "build:server": "cd server && yarn run build",
+    "build": "yarn run build:server && yarn run build:web && rm -rf ./output && mkdir output && mv server/lib output/server && mv web/dist output/web"
   },
   "author": "Apisit Lee",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/apisitlee/winston-dashboard-vue.git"
+  },
+  "workspaces": [
+    "server",
+    "web"
+  ],
   "license": "ISC"
 }

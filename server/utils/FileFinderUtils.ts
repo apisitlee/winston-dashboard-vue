@@ -3,42 +3,11 @@ import path from 'path';
 import { promisify } from 'util';
 
 const readdir = promisify(fs.readdir);
-// const createReadStream = promisify(fs.createReadStream);
 
-function streamReadFile(config) {
-    return new Promise((resolve, reject) => {
-        const { logFilename, logPath } = config || {};
-        let chunks = '';
-        if (!logFilename || !logPath) {
-            return resolve('');
-        }
-        const logFilePath = `${logPath}/${logFilename}`;
-        if (!fs.existsSync(logFilePath)) {
-            return resolve('');
-        }
-        // stream read file
-        const stream = fs.createReadStream(logFilePath, {
-            encoding: 'utf8',
-        });
-        stream.on('data', (chunk) => {
-            // return resolve(chunk);
-            chunks += chunk;
-        });
-        stream.on('end', () => {
-            console.log('stream read file end.');
-            resolve(chunks);
-        });
-        stream.on('error', (err) => {
-            console.log(err);
-            reject(err);
-        });
-    });
-}
-
-function streamReadFiles(config) {
+function streamReadFiles(config: any) {
     const { logFilename, logPath } = config || {};
     const regex = new RegExp(logFilename);
-    const fileContents = [];
+    const fileContents: string[] = [];
     return readdir(logPath)
         .then((fileList) => {
             const fileReadPromises = fileList.map((filename) => {
@@ -56,7 +25,7 @@ function streamReadFiles(config) {
                         stream.on('end', () => {
                             console.log('读完了', filename);
                             fileContents.push(content);
-                            resolve();
+                            resolve(true);
                         });
 
                         stream.on('error', (error) => {
@@ -64,7 +33,7 @@ function streamReadFiles(config) {
                         });
                     } else {
                         console.log('不符合', filename);
-                        resolve();
+                        resolve(false);
                     }
                 });
             });
@@ -77,10 +46,9 @@ function streamReadFiles(config) {
         });
 }
 
-export async function fileFinder(onUpdate) {
-    if (!onUpdate && !(onUpdate instanceof Function)) return;
-    async function find() {
-        const list = [];
+export async function fileFinder(onUpdate: any): Promise<any> {
+    async function find(): Promise<any[]> {
+        const list: any[] = [];
         // 读取../storage.local/active文件
         const active = fs.readFileSync(path.resolve(process.cwd(), 'server/storage.local/active.txt'), {
             encoding: 'utf8',
@@ -102,11 +70,11 @@ export async function fileFinder(onUpdate) {
             return item.timestamp === active;
         }).pop() || {};
         try {
-            const file = await streamReadFiles(config);
+            const file = (await streamReadFiles(config)) || '';
             file.split('\n').map((item, index) => {
                 if (!item) return;
                 try {
-                    const json = JSON.parse(item);
+                    const json: any = JSON.parse(item);
                     list.unshift(json);
                 } catch (e) {
                     console.log('json parse error', e);

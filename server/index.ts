@@ -6,8 +6,9 @@ import { fileFinder } from './utils/FileFinderUtils.js';
 import path from 'path';
 import fs from 'fs';
 import setupStorage from './utils/StorageUtils.js';
+import type { WinstonDashboardServerConfig } from './index.d.js';
 
-export default async function WinstonDashboardServer(config = {}) {
+export default async function WinstonDashboardServer(config: WinstonDashboardServerConfig = {}) {
 
     const port = config.port || 6688;
 
@@ -17,8 +18,8 @@ export default async function WinstonDashboardServer(config = {}) {
     // 本地存储
     setupStorage();
 
-    let list = [];
-    const { flush } = await fileFinder((data) => {
+    let list: any[] = [];
+    const { flush } = await fileFinder((data: any[]) => {
         list = data;
     });
 
@@ -29,7 +30,7 @@ export default async function WinstonDashboardServer(config = {}) {
     app.use(bodyParser());
 
     // 添加日志监控配置
-    router.post('/api/logConfig/add', async ctx => {
+    router.post('/api/logConfig/add', async (ctx: any) => {
         const { body } = ctx.request;
         const { logPath, logFilename, name, tags = [] } = body || {};
         const tagStr = JSON.stringify(Array.from(tags));
@@ -59,7 +60,7 @@ export default async function WinstonDashboardServer(config = {}) {
     });
 
     // 根据timestamp删除日志监控配置中的一条
-    router.delete('/api/logConfig/delete', async ctx => {
+    router.delete('/api/logConfig/delete', async (ctx: any) => {
         const { body } = ctx.request;
         const { timestamp } = body || {};
         if (!timestamp) {
@@ -71,10 +72,10 @@ export default async function WinstonDashboardServer(config = {}) {
         }
         try {
             // 读取../storage.local/logs文件，获取所有日志源
-            let list = fs.readFileSync(path.resolve(process.cwd(), 'server/storage.local/logs.txt'), {
+            let listStr = fs.readFileSync(path.resolve(process.cwd(), 'server/storage.local/logs.txt'), {
                 encoding: 'utf8',
             }).trim();
-            list = list.length ? list.split('\n').map((item) => {
+            let list = listStr.length ? listStr.split('\n').map((item) => {
                 const [timestamp, name, logPath, logFilename, tagStr] = item.split('\t');
                 return {
                     timestamp,
@@ -87,9 +88,9 @@ export default async function WinstonDashboardServer(config = {}) {
             list = list.filter((row) => {
                 return row.timestamp !== timestamp;
             });
-            list = list.map((row) => `${row.timestamp}\t${row.name}\t${row.logPath}\t${row.logFilename}\t${row.tagStr}`).join('\n');
+            listStr = list.map((row) => `${row.timestamp}\t${row.name}\t${row.logPath}\t${row.logFilename}\t${row.tagStr}`).join('\n');
             // 覆写
-            fs.writeFileSync(path.resolve(process.cwd(), 'server/storage.local/logs.txt'), list + '\n');
+            fs.writeFileSync(path.resolve(process.cwd(), 'server/storage.local/logs.txt'), listStr + '\n');
             ctx.body = {
                 code: 0,
                 msg: '删除成功'
@@ -104,7 +105,7 @@ export default async function WinstonDashboardServer(config = {}) {
     });
 
     // 修改日志监控配置
-    router.post('/api/logConfig/update', async ctx => {
+    router.post('/api/logConfig/update', async (ctx: any) => {
         const { body } = ctx.request;
         const { timestamp, logPath, logFilename, name, tags = [] } = body || {};
         const tagStr = JSON.stringify(Array.from(tags));
@@ -117,10 +118,10 @@ export default async function WinstonDashboardServer(config = {}) {
         }
         try {
             // 读取../storage.local/logs文件，获取所有日志源
-            let list = fs.readFileSync(path.resolve(process.cwd(), 'server/storage.local/logs.txt'), {
+            let listStr = fs.readFileSync(path.resolve(process.cwd(), 'server/storage.local/logs.txt'), {
                 encoding: 'utf8',
             }).trim();
-            list = list.length ? list.split('\n').map((item) => {
+            let list = listStr.length ? listStr.split('\n').map((item) => {
                 const [timestamp, name, logPath, logFilename, tagStr] = item.split('\t');
                 return {
                     timestamp,
@@ -142,9 +143,9 @@ export default async function WinstonDashboardServer(config = {}) {
                 }
                 return row;
             });
-            list = list.map((row) => `${row.timestamp}\t${row.name}\t${row.logPath}\t${row.logFilename}\t${row.tagStr}`).join('\n');
+            listStr = list.map((row) => `${row.timestamp}\t${row.name}\t${row.logPath}\t${row.logFilename}\t${row.tagStr}`).join('\n');
             // 覆写
-            fs.writeFileSync(path.resolve(process.cwd(), 'server/storage.local/logs.txt'), list + '\n');
+            fs.writeFileSync(path.resolve(process.cwd(), 'server/storage.local/logs.txt'), listStr + '\n');
             ctx.body = {
                 code: 0,
                 msg: '修改成功'
@@ -159,7 +160,7 @@ export default async function WinstonDashboardServer(config = {}) {
     });
 
     // 读取日志源列表
-    router.get('/api/logConfig/list', async ctx => {
+    router.get('/api/logConfig/list', async (ctx: any) => {
         try {
             // 读取../storage.local/logs文件，获取所有日志源
             const list = fs.readFileSync(path.resolve(process.cwd(), 'server/storage.local/logs.txt'), {
@@ -189,7 +190,7 @@ export default async function WinstonDashboardServer(config = {}) {
     });
 
     // 设置监控日志源
-    router.post('/api/logConfig/active', async ctx => {
+    router.post('/api/logConfig/active', async (ctx: any) => {
         const { body } = ctx.request;
         const { timestamp } = body || {};
         if (!timestamp) {
@@ -218,7 +219,7 @@ export default async function WinstonDashboardServer(config = {}) {
     });
 
     // 查询active日志源
-    router.get('/api/logConfig/active', async ctx => {
+    router.get('/api/logConfig/active', async (ctx: any) => {
         try {
             // 读取../storage.local/active文件
             const timestamp = fs.readFileSync(path.resolve(process.cwd(), 'server/storage.local/active.txt'), {
@@ -239,7 +240,7 @@ export default async function WinstonDashboardServer(config = {}) {
     });
 
     // 查询日志
-    router.get('/api/query', async ctx => {
+    router.get('/api/query', async (ctx: any) => {
         const { query } = ctx.request;
         let { level, s, pageNo = 1, pageSize = 10, range = '' } = query || {};
         pageNo = parseInt(pageNo);
