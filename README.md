@@ -8,11 +8,14 @@ Vue3版本的winston日志看板。
 import WinstonDashboardVue from 'winston-dashboard-vue';
 
 WinstonDashboardVue({
-    port: 8801
+    port: 8801，
+    storageDir: '/usr/local/wdv-storage.local'
 });
 ```
 
-> 其中，port默认值是6688。
+> 其中，
+> 参数 `port` 默认值是6688。
+> 参数 `storageDir` 默认值是当前项目根目录下'storage.local'目录，用于记录日志平台使用信息。 如配置的目录在您项目目录下，清将此storage目录添加到.gitignore文件中。
 
 开启服务后，即可在http://localhost:8801查看日志看板界面了。
 

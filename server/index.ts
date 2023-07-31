@@ -4,7 +4,6 @@ import bodyParser from 'koa-bodyparser';
 import serve from 'koa-static';
 import { fileFinder } from './utils/FileFinderUtils.js';
 import path from 'path';
-import fs from 'fs';
 import setupStorage from './utils/StorageUtils.js';
 import type { WinstonDashboardServerConfig } from './index.d.js';
 
@@ -16,7 +15,9 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
     const router = new Router();
 
     // 本地存储
-    setupStorage();
+    const { readStorage, writeStorage, appendStorage } = setupStorage({
+        storageDir: path.resolve(process.cwd(), config.storageDir || 'storage.local')
+    });
 
     let list: any[] = [];
     const { flush } = await fileFinder((data: any[]) => {
@@ -45,7 +46,7 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
             // 创建一条记录，格式：timestamp\tname\tlogPath\tlogFilename
             const newRecord = `${new Date().getTime()}\t${name}\t${logPath}\t${logFilename}\t${tagStr}`;
             // 将记录添加在../storage.local/logs文件最后一行
-            fs.appendFileSync(path.resolve(process.cwd(), 'server/storage.local/logs.txt'), newRecord + '\n');
+            appendStorage('logs.txt', newRecord + '\n');
             ctx.body = {
                 code: 0,
                 msg: '添加成功'
@@ -72,9 +73,7 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
         }
         try {
             // 读取../storage.local/logs文件，获取所有日志源
-            let listStr = fs.readFileSync(path.resolve(process.cwd(), 'server/storage.local/logs.txt'), {
-                encoding: 'utf8',
-            }).trim();
+            let listStr = readStorage('logs.txt');
             let list = listStr.length ? listStr.split('\n').map((item) => {
                 const [timestamp, name, logPath, logFilename, tagStr] = item.split('\t');
                 return {
@@ -90,7 +89,7 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
             });
             listStr = list.map((row) => `${row.timestamp}\t${row.name}\t${row.logPath}\t${row.logFilename}\t${row.tagStr}`).join('\n');
             // 覆写
-            fs.writeFileSync(path.resolve(process.cwd(), 'server/storage.local/logs.txt'), listStr + '\n');
+            writeStorage('logs.txt', listStr + '\n');
             ctx.body = {
                 code: 0,
                 msg: '删除成功'
@@ -118,9 +117,7 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
         }
         try {
             // 读取../storage.local/logs文件，获取所有日志源
-            let listStr = fs.readFileSync(path.resolve(process.cwd(), 'server/storage.local/logs.txt'), {
-                encoding: 'utf8',
-            }).trim();
+            let listStr = readStorage('logs.txt');
             let list = listStr.length ? listStr.split('\n').map((item) => {
                 const [timestamp, name, logPath, logFilename, tagStr] = item.split('\t');
                 return {
@@ -145,7 +142,7 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
             });
             listStr = list.map((row) => `${row.timestamp}\t${row.name}\t${row.logPath}\t${row.logFilename}\t${row.tagStr}`).join('\n');
             // 覆写
-            fs.writeFileSync(path.resolve(process.cwd(), 'server/storage.local/logs.txt'), listStr + '\n');
+            writeStorage('logs.txt', listStr + '\n');
             ctx.body = {
                 code: 0,
                 msg: '修改成功'
@@ -163,9 +160,7 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
     router.get('/api/logConfig/list', async (ctx: any) => {
         try {
             // 读取../storage.local/logs文件，获取所有日志源
-            const list = fs.readFileSync(path.resolve(process.cwd(), 'server/storage.local/logs.txt'), {
-                encoding: 'utf8',
-            }).trim();
+            const list = readStorage('logs.txt');
             ctx.body = {
                 code: 0,
                 msg: 'success',
@@ -202,7 +197,7 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
         }
         try {
             // 将timestamp写入../storage.local/active文件
-            fs.writeFileSync(path.resolve(process.cwd(), 'server/storage.local/active.txt'), timestamp);
+            writeStorage('active.txt', timestamp);
             ctx.body = {
                 code: 0,
                 msg: '设置成功'
@@ -222,9 +217,7 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
     router.get('/api/logConfig/active', async (ctx: any) => {
         try {
             // 读取../storage.local/active文件
-            const timestamp = fs.readFileSync(path.resolve(process.cwd(), 'server/storage.local/active.txt'), {
-                encoding: 'utf8',
-            }).trim();
+            const timestamp = readStorage('active.txt');
             ctx.body = {
                 code: 0,
                 msg: '成功',
