@@ -11,7 +11,8 @@
     }
   },
   "files": [
-    "output"
+    "output",
+    "index.cjs"
   ],
   "scripts": {
     "test": "node test.js",
