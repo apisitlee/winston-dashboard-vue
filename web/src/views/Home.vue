@@ -3,7 +3,7 @@
     <a-spin :loading="loading" style="width: 100%">
       <div>
         <a-radio-group v-model="active" type="button" @change="onChangeSource">
-          <a-radio :value="config.timestamp" v-for="config in logConfigs">
+          <a-radio :value="config.id" v-for="config in logConfigs">
             {{ config.name }}
           </a-radio>
         </a-radio-group>
@@ -14,43 +14,23 @@
             <a-input v-model="form.s" placeholder="模糊搜索日志内容" allow-clear />
           </a-form-item>
           <a-form-item field="level">
-            <a-select
-              v-model="form.level"
-              placeholder="日志等级"
-              allow-clear
-              style="width: 120px"
-            >
+            <a-select v-model="form.level" placeholder="日志等级" allow-clear style="width: 120px">
               <a-option value="info">info</a-option>
               <a-option value="error">error</a-option>
             </a-select>
           </a-form-item>
           <a-form-item field="range">
-            <a-range-picker
-              v-model="form.range"
-              format="YYYY-MM-DD"
-              :placeholder="['开始日期', '结束日期']"
-              allow-clear
-              style="width: 240px"
-            />
+            <a-range-picker v-model="form.range" format="YYYY-MM-DD" :placeholder="['开始日期', '结束日期']" allow-clear
+              style="width: 240px" />
           </a-form-item>
           <a-form-item field="tag">
             <a-input-group>
-              <a-select
-                v-model="form.tag[0]"
-                placeholder="标签名称"
-                clearable
-                style="width: 120px"
-              >
+              <a-select v-model="form.tag[0]" placeholder="标签名称" clearable style="width: 120px">
                 <a-option v-for="tag in tagsDef" :value="tag.slug">
                   {{ tag.label }}
                 </a-option>
               </a-select>
-              <a-input
-                v-model="form.tag[1]"
-                placeholder="标签值"
-                clearable
-                style="width: 120px"
-              />
+              <a-input v-model="form.tag[1]" placeholder="标签值" clearable style="width: 120px" />
             </a-input-group>
           </a-form-item>
           <a-form-item>
@@ -63,15 +43,8 @@
           </a-form-item>
         </a-form>
       </div>
-      <a-table
-        :data="tableData"
-        :columns="columns"
-        :pagination="false"
-        :loading="loading"
-        bordered
-        stripe
-        column-resizable
-      >
+      <a-table :data="tableData" :columns="columns" :pagination="false" :loading="loading" bordered stripe
+        column-resizable>
         <template #_index="{ rowIndex }">{{ rowIndex + 1 }}</template>
         <template #level="{ record }">
           <span :class="record.level">{{ record.level }}</span>
@@ -81,10 +54,7 @@
         </template>
         <template #tags="{ record, rowIndex }">
           <a-space wrap>
-            <a-tag
-              v-for="(tag, ind) in Object.entries(record.tags || {})"
-              :key="`${rowIndex}-${ind}`"
-            >
+            <a-tag v-for="(tag, ind) in Object.entries(record.tags || {})" :key="`${rowIndex}-${ind}`">
               {{ tagsMap[tag[0]] }}: {{ tag[1] }}
             </a-tag>
           </a-space>
@@ -97,16 +67,8 @@
       </a-table>
     </a-spin>
     <div class="log-table-foot" v-show="pagination.total !== 0">
-      <a-pagination
-        v-model:current="pagination.pageNo"
-        v-model:page-size="pagination.pageSize"
-        :total="pagination.total"
-        :page-size-options="[10, 20, 50, 100]"
-        show-total
-        show-jumper
-        show-page-size
-        @change="loadData"
-      />
+      <a-pagination v-model:current="pagination.pageNo" v-model:page-size="pagination.pageSize" :total="pagination.total"
+        :page-size-options="[10, 20, 50, 100]" show-total show-jumper show-page-size @change="loadData" />
     </div>
   </div>
   <DetailModal ref="detailModalRef" />
@@ -142,7 +104,7 @@ const pagination = ref({
 const form = ref({
   level: "",
   s: "",
-  range: [dayjs().format("YYYY-MM-DD 00:00:00"), dayjs().format("YYYY-MM-DD 23:59:59")],
+  range: [dayjs().format("YYYY-MM-DD HH:mm:00"), dayjs().format("YYYY-MM-DD HH:mm:59")],
   tag: [],
 });
 const active = ref("");
@@ -250,7 +212,7 @@ async function onChangeSource(ev: any) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        timestamp: ev,
+        id: ev,
       }),
     });
     const data = await res.json();
@@ -271,7 +233,7 @@ async function onChangeSource(ev: any) {
 function setTagsByConfig() {
   let list: any[] = [];
   let map: Record<string, string> = {};
-  const config = logConfigs.value.find((conf: any) => conf.timestamp === active.value);
+  const config = logConfigs.value.find((conf: any) => conf.id === active.value);
   if (config) {
     list = config.tags || [];
     list.map((tag: any) => {
@@ -294,6 +256,7 @@ function onClickItem(record: any, index: number) {
 .query-form {
   margin: 12px 0 0 0;
 }
+
 .info {
   background-color: #e5edff;
   color: #165dff;
@@ -324,6 +287,7 @@ function onClickItem(record: any, index: number) {
 .log-table .arco-form-item-layout-inline {
   margin-right: 0;
 }
+
 .log-table .max-3-lines {
   width: 100%;
   max-height: 200px;

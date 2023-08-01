@@ -15,6 +15,7 @@ declare module 'vue' {
     AFormItem: typeof import('@arco-design/web-vue')['FormItem']
     AInput: typeof import('@arco-design/web-vue')['Input']
     AInputGroup: typeof import('@arco-design/web-vue')['InputGroup']
+    AInputNumber: typeof import('@arco-design/web-vue')['InputNumber']
     AModal: typeof import('@arco-design/web-vue')['Modal']
     AOption: typeof import('@arco-design/web-vue')['Option']
     APagination: typeof import('@arco-design/web-vue')['Pagination']

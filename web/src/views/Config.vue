@@ -2,13 +2,7 @@
   <div>
     <a-button type="primary" @click="onClickAdd">新建配置</a-button>
   </div>
-  <a-table
-    :data="logConfigs"
-    :columns="columns"
-    :pagination="false"
-    stripe
-    style="margin-top: 24px"
-  >
+  <a-table :data="logConfigs" :columns="columns" :pagination="false" stripe style="margin-top: 24px">
     <template #tags="{ record }">
       <a-space>
         <a-tag v-for="(tag, i) in record.tags || []" :key="i">
@@ -25,36 +19,24 @@
       </a-space>
     </template>
   </a-table>
-  <a-modal
-    v-model:visible="visible"
-    :title="title"
-    width="680px"
-    @cancel="close"
-    @ok="ok"
-  >
-    <a-form ref="formRef" :model="form" :rules="rules" @submit="submit">
+  <a-modal v-model:visible="visible" :title="title" fullscreen @cancel="close" @ok="ok">
+    <a-form ref="formRef" :model="form" :rules="rules" auto-label-width @submit="submit">
       <a-form-item field="timestamp" label="时间戳" v-show="false">
         <a-input v-model="form.timestamp" />
       </a-form-item>
       <a-form-item field="name" label="日志名称">
-        <a-input v-model="form.name" />
+        <a-input v-model="form.name" placeholder="用于区分不同的日志" />
       </a-form-item>
       <a-form-item field="logPath" label="日志目录">
-        <a-input v-model="form.logPath" />
+        <a-input v-model="form.logPath" placeholder="绝对路径，例如：/usr/local/logs/xx-project/" />
       </a-form-item>
       <a-form-item field="logFilename" label="日志文件名">
-        <a-input v-model="form.logFilename" />
+        <a-input v-model="form.logFilename" placeholder="包括文件扩展名，例如：request-log.log；支持正则匹配，例如：^request\-.*\.log$" />
       </a-form-item>
       <a-form-item field="tags" label="业务标签">
         <div>
-          <a-table
-            :data="form.tags"
-            :columns="tagColumns"
-            :pagination="false"
-            :draggable="{ type: 'handle', width: 40 }"
-            style="width: 100%"
-            @change="handleTagTableChange"
-          >
+          <a-table :data="form.tags" :columns="tagColumns" :pagination="false" :draggable="{ type: 'handle', width: 40 }"
+            style="width: 100%" @change="handleTagTableChange">
             <template #label="{ record }">
               <a-input v-model="record.label" placeholder="标签名称" />
             </template>
@@ -62,12 +44,7 @@
               <a-input v-model="record.slug" placeholder="标签key" />
             </template>
             <template #action="{ rowIndex }">
-              <a-button
-                size="small"
-                type="text"
-                status="danger"
-                @click="() => onClickRemoveTag(rowIndex)"
-              >
+              <a-button size="small" type="text" status="danger" @click="() => onClickRemoveTag(rowIndex)">
                 <template #icon>
                   <icon-minus-circle />
                 </template>
@@ -82,6 +59,51 @@
           </a-button>
         </div>
       </a-form-item>
+      <a-form-item field="customColumns" label="自定义列">
+        <div>
+          <a-table :data="form.customColumns" :columns="customColumnsColumns" :pagination="false"
+            :draggable="{ type: 'handle', width: 40 }" style="width: 100%" @change="handleCustomColumnsTableChange">
+            <template #title="{ record }">
+              <a-input v-model="record.title" placeholder="列名称" />
+            </template>
+            <template #dataIndex="{ record }">
+              <a-input v-model="record.dataIndex" placeholder="字段名" />
+            </template>
+            <template #width="{ record }">
+              <div style="display: flex; align-items: center">
+                <a-input-number v-model="record.width" placeholder="列宽" />
+                <span style="width: 2.5em; flex-shrink: 0; text-align: right">像素</span>
+              </div>
+            </template>
+            <template #fixed="{ record }">
+              <a-select v-model="record.fixed">
+                <a-option value="">不固定</a-option>
+                <a-option value="left">固定在表格左侧</a-option>
+                <a-option value="right">固定在表格右侧</a-option>
+              </a-select>
+            </template>
+            <template #ellipsis="{ record }">
+              <a-radio-group v-model="record.ellipsis" type="button">
+                <a-radio :value="false">超长不省略</a-radio>
+                <a-radio :value="true">超长省略</a-radio>
+              </a-radio-group>
+            </template>
+            <template #action="{ rowIndex }">
+              <a-button size="small" type="text" status="danger" @click="() => onClickRemoveCustomColumn(rowIndex)">
+                <template #icon>
+                  <icon-minus-circle />
+                </template>
+              </a-button>
+            </template>
+          </a-table>
+          <a-button type="outline" style="margin-top: 12px" @click="onClickAddCustomColumn">
+            <template #icon>
+              <icon-plus />
+            </template>
+            <span>添加自定义列</span>
+          </a-button>
+        </div>
+      </a-form-item>
     </a-form>
   </a-modal>
 </template>
@@ -91,14 +113,39 @@ import { onMounted, ref } from "vue";
 import { Modal, Message } from "@arco-design/web-vue";
 import { IconPlus, IconMinusCircle } from "@arco-design/web-vue/es/icon";
 
+type Tag = {
+  label: string;
+  slug: string;
+};
+
+type CustomColumn = {
+  title: string;
+  dataIndex: string;
+  width?: number;
+  fixed: string;
+  ellipsis: boolean;
+};
+
+type FormData = {
+  id: string;
+  timestamp: string;
+  name: string;
+  logPath: string;
+  logFilename: string;
+  tags: Tag[];
+  customColumns: CustomColumn[];
+};
+
 const logConfigs = ref<any>([]);
 const formRef = ref();
-const form = ref<any>({
+const form = ref<FormData>({
+  id: "",
   timestamp: "",
   name: "",
   logPath: "",
   logFilename: "",
   tags: [{ label: "", slug: "" }],
+  customColumns: [{ title: "", dataIndex: "", width: 200, fixed: "", ellipsis: true }],
 });
 const rules = ref({
   name: [
@@ -159,6 +206,42 @@ const tagColumns = ref([
     slotName: "action",
   },
 ]);
+const customColumnsColumns = ref([
+  {
+    title: "列名称 (必填)",
+    dataIndex: "title",
+    slotName: "title",
+    width: 200,
+  },
+  {
+    title: "字段名 (必填)",
+    dataIndex: "dataIndex",
+    slotName: "dataIndex",
+    width: 200,
+  },
+  {
+    title: "列宽",
+    dataIndex: "width",
+    slotName: "width",
+    width: 150,
+  },
+  {
+    title: "固定列",
+    dataIndex: "fixed",
+    slotName: "fixed",
+    width: 200,
+  },
+  {
+    title: "文本省略",
+    dataIndex: "ellipsis",
+    slotName: "ellipsis",
+    width: 250,
+  },
+  {
+    title: "",
+    slotName: "action",
+  },
+]);
 const visible = ref(false);
 const title = ref("");
 
@@ -201,7 +284,7 @@ function onClickDelete(row: any) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            timestamp: row.timestamp,
+            id: row.id,
           }),
         });
         const { code, msg } = await res.json();
@@ -225,7 +308,7 @@ function onClickDelete(row: any) {
 
 async function submit() {
   try {
-    const url = form.value.timestamp
+    const url = form.value.id
       ? `${import.meta.env.VITE_BASE_URL}api/logConfig/update`
       : `${import.meta.env.VITE_BASE_URL}api/logConfig/add`;
     const res = await fetch(url, {
@@ -240,14 +323,14 @@ async function submit() {
       throw new Error(msg);
     }
     Message.success({
-      content: form.value.timestamp ? "修改成功" : "添加成功",
+      content: form.value.id ? "修改成功" : "添加成功",
     });
     formRef.value.resetFields();
     await loadLogConfigs();
   } catch (e: any) {
     console.error(e);
     Modal.error({
-      title: form.value.timestamp ? "修改失败" : "添加失败",
+      title: form.value.id ? "修改失败" : "添加失败",
       content: e.msg || typeof e === "string" ? e : JSON.stringify(e),
     });
   }
@@ -271,5 +354,21 @@ function onClickRemoveTag(index: number) {
 }
 function handleTagTableChange(_data: any) {
   form.value.tags = _data;
+}
+
+function onClickAddCustomColumn() {
+  form.value.customColumns.push({
+    title: "",
+    dataIndex: "",
+    width: 200,
+    fixed: "",
+    ellipsis: true,
+  });
+}
+function onClickRemoveCustomColumn(index: number) {
+  form.value.customColumns.splice(index, 1);
+}
+function handleCustomColumnsTableChange(_data: any) {
+  form.value.customColumns = _data;
 }
 </script>
