@@ -38,6 +38,7 @@ export const LogicUtils = {
                 pass = target === '' || target === null || target === undefined;
                 break;
             case 'nn': // 不为空
+                console.log('\n\n不为空吗？\n', target, typeof target);
                 pass = target !== '' && target !== null && target !== undefined;
                 break;
             case 'lt': // 晚于
