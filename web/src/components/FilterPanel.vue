@@ -31,6 +31,13 @@
                                     </a-option>
                                 </a-select>
                             </a-col>
+                            <a-col :span="4" v-if="getColTypeByName(filter.colName) === '业务标签'">
+                                <a-select v-model="filter.tagKey" placeholder="请选择" allow-clear style="width: 100%">
+                                    <a-option v-for="tag in tags" :value="tag.slug">
+                                        {{ tag.label }}
+                                    </a-option>
+                                </a-select>
+                            </a-col>
                             <a-col :span="4">
                                 <a-select v-model="filter.relation" style="width: 100%">
                                     <a-option v-for="relation in getColRelations(filter.colName)" :value="relation">
@@ -54,7 +61,7 @@
                                 <a-date-picker v-model="filter.value" placeholder="请选择" format="YYYY-MM-DD HH:mm:ss"
                                     show-time allow-clear style="width: 190px" />
                             </a-col>
-                            <a-col :span="12" v-if="getColTypeByName(filter.colName) === '业务标签'">
+                            <a-col :span="8" v-if="getColTypeByName(filter.colName) === '业务标签'">
                                 <a-input v-model="filter.value" placeholder="请输入" allow-clear style="width: 100%" />
                             </a-col>
                             <a-col :span="2">
@@ -150,28 +157,28 @@ function handleQuery() {
                     dataIndex: column.dataIndex,
                     relation: row.relation,
                     value: row.value,
-                    isCustom: column.isCustom,
+                    isCustom: column.isCustom || false,
                 });
             } else if (column.type === "枚举") {
                 list.push({
                     dataIndex: column.dataIndex,
                     relation: row.relation,
                     value: row.value,
-                    isCustom: column.isCustom,
+                    isCustom: column.isCustom || false,
                 });
             } else if (column.type === "时间") {
                 list.push({
                     dataIndex: column.dataIndex,
                     relation: row.relation,
                     value: row.value,
-                    isCustom: column.isCustom,
+                    isCustom: column.isCustom || false,
                 });
             } else if (column.type === "业务标签") {
                 list.push({
-                    dataIndex: column.dataIndex,
+                    dataIndex: `${column.dataIndex}.${row.tagKey}`,
                     relation: row.relation,
                     value: row.value,
-                    isCustom: column.isCustom,
+                    isCustom: column.isCustom || false,
                 });
             }
         }
