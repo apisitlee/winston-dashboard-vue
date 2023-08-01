@@ -73,12 +73,10 @@
                         </template>
                         添加条件
                     </a-button>
-                    <a-button size="small" type="text">
-                        <template #icon>
-                            <icon-save />
-                        </template>
-                        另存为新视图
-                    </a-button>
+                    <a-space>
+                        <a-button type="primary">查询</a-button>
+                        <a-button>重置</a-button>
+                    </a-space>
                 </div>
             </section>
         </template>
@@ -86,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import { IconFilter, IconPlus, IconSave, IconClose } from "@arco-design/web-vue/es/icon";
+import { IconFilter, IconPlus, IconClose } from "@arco-design/web-vue/es/icon";
 import { ref, computed } from "vue";
 
 type Props = {
