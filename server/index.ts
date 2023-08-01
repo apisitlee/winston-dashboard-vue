@@ -258,7 +258,7 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
                     // dataIndex, relation, value, isCustom
                     const relate = filterRelation === '所有' ? LogicUtils.and : LogicUtils.or;
                     return relate(...filters.map((filter: any) => {
-                        return LogicUtils.assert(getSourceValue(item, filter.dataIndex, filter.isCustom), filter.value, filter.relate)
+                        return LogicUtils.assert(getSourceValue(item, filter.dataIndex, filter.isCustom), filter.value, filter.relation)
                     }));
                 }
                 return true;
