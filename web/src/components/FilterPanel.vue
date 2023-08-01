@@ -22,7 +22,7 @@
                 <div class="filter-pop-body">
                     <div class="filter-row" v-for="(filter, index) in filters" :key="index">
                         <a-row :gutter="12">
-                            <a-col :span="8">
+                            <a-col :span="6">
                                 <a-select v-model="filter.colName" placeholder="请选择字段" style="width: 100%">
                                     <a-option v-for="(col, i) in filterColNames" :key="`${index}-${i}`"
                                         :value="col.dataIndex">
@@ -30,14 +30,30 @@
                                     </a-option>
                                 </a-select>
                             </a-col>
-                            <a-col :span="5">
+                            <a-col :span="4">
                                 <a-select v-model="filter.relation" style="width: 100%">
                                     <a-option v-for="relation in getColRelations(filter.colName)" :value="relation">
                                         {{ relation }}
                                     </a-option>
                                 </a-select>
                             </a-col>
-                            <a-col :span="9">
+                            <a-col :span="12" v-if="getColTypeByName(filter.colName) === '文本'">
+                                <a-input v-model="filter.value" placeholder="请输入" allow-clear style="width: 100%" />
+                            </a-col>
+                            <a-col :span="12" v-if="getColTypeByName(filter.colName) === '枚举' &&
+                                !['为空', '不为空'].includes(filter.relation)
+                                ">
+                                <a-select v-model="filter.value" placeholder="请选择" allow-clear style="width: 100%">
+                                    <a-option v-for="opt in getColEnumsByName(filter.colName)" :value="opt">
+                                        {{ opt }}
+                                    </a-option>
+                                </a-select>
+                            </a-col>
+                            <a-col :span="12" v-if="getColTypeByName(filter.colName) === '时间'">
+                                <a-date-picker v-model="filter.value" placeholder="请选择" format="YYYY-MM-DD HH:mm:ss"
+                                    show-time allow-clear style="width: 100%" />
+                            </a-col>
+                            <a-col :span="12" v-if="getColTypeByName(filter.colName) === '业务标签'">
                                 <a-input v-model="filter.value" placeholder="请输入" allow-clear style="width: 100%" />
                             </a-col>
                             <a-col :span="2">
@@ -84,7 +100,7 @@ const filterRelation = ref("所有");
 // 针对不同类型，关系列表不同
 const relations: Record<string, any[]> = {
     文本: ["等于", "不等于", "包含", "不包含", "为空", "不为空"],
-    枚举: ["等于", "不等于", "包含", "不包含", "为空", "不为空"],
+    枚举: ["等于", "不等于", "为空", "不为空"],
     时间: ["等于", "晚于", "早于", "为空", "不为空"],
     业务标签: ["等于", "不等于", "包含", "不包含", "为空", "不为空"],
 };
@@ -100,6 +116,10 @@ function getColRelations(colName: string): any[] {
     } else {
         return [];
     }
+}
+function getColEnumsByName(colName: string) {
+    const { enum: enums = "" } = props.columns.find((col) => col.title === colName) || {};
+    return enums ? enums.split(",") : [];
 }
 
 function handleAddFilter() {

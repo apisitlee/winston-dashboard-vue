@@ -88,27 +88,39 @@ import { onMounted, ref, computed, ComputedRef } from "vue";
 import { Modal } from "@arco-design/web-vue";
 // @ts-ignore
 import DetailModal from "./components/DetailModal.vue";
-import {
-  IconRefresh,
-} from "@arco-design/web-vue/es/icon";
+import { IconRefresh } from "@arco-design/web-vue/es/icon";
 import FilterPanel from "../components/FilterPanel.vue";
 
 const logConfigs = ref<any>([]);
 const tableData = ref<any>([]);
 const columnsBefore = ref([
   { title: "#", dataIndex: "_index", slotName: "_index", width: 80, fixed: "left" },
-  { title: "日志等级", dataIndex: "level", slotName: "level", width: 100 },
+  {
+    title: "日志等级",
+    dataIndex: "level",
+    slotName: "level",
+    width: 100,
+    type: "枚举",
+    enum: "info,error",
+  },
   {
     title: "日志内容",
     dataIndex: "message",
     slotName: "message",
     cellClass: "max-3-lines",
+    type: "文本",
     width: 300,
   },
-  { title: "业务标签", dataIndex: "tags", slotName: "tags", width: 200 },
+  {
+    title: "业务标签",
+    dataIndex: "tags",
+    slotName: "tags",
+    width: 200,
+    type: "业务标签",
+  },
 ]);
 const columnsAfter = ref([
-  { title: "记录时间", dataIndex: "timestamp", width: 180 },
+  { title: "记录时间", dataIndex: "timestamp", width: 180, type: "时间" },
   { title: "操作", dataIndex: "action", slotName: "action", width: 100, fixed: "right" },
 ]);
 const customColumns = ref([]);
@@ -140,7 +152,7 @@ const pagination = ref({
 const filters = ref<any[]>([]);
 const filterColNames = computed(() => {
   const list = columns.value.filter((item: any) => {
-    return !["#", "日志等级", "记录时间", "操作"].includes(item.title);
+    return !["#", "操作"].includes(item.title);
   });
   return list;
 });
