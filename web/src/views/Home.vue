@@ -230,27 +230,20 @@ async function loadData() {
   loading.value = true;
   try {
     await loadLogConfigs();
-    const params: any = {
-      s: form.value.s,
-      level: form.value.level,
-      range: form.value.range,
-      pageSize: pagination.value.pageSize,
-      pageNo: pagination.value.pageNo,
-      filters: filters.value,
-      filterRelation: filterRelation.value,
-    };
-    const requestUrl = new URL(
-      `${import.meta.env.VITE_BASE_URL}api/query`,
-      window.location.origin
-    );
-    Object.keys(params).forEach((key) =>
-      requestUrl.searchParams.append(key, params[key])
-    );
-    const res = await fetch(requestUrl, {
+    const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/query`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        s: form.value.s,
+        level: form.value.level,
+        range: form.value.range,
+        pageSize: pagination.value.pageSize,
+        pageNo: pagination.value.pageNo,
+        filters: filters.value,
+        filterRelation: filterRelation.value,
+      }),
     });
     const data = await res.json();
     const {

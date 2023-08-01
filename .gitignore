@@ -12,6 +12,8 @@ dist-ssr
 *.local
 output
 
+server/lib
+
 # Editor directories and files
 web/.vscode/*
 */.vscode/*
