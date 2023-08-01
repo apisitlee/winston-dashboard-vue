@@ -18,52 +18,62 @@
           </a-button>
           <template #content>
             <section style="width: 500px; max-height: 350px; overflow: auto">
-              <div>
-                <div>设置筛选条件</div>
-                <div v-show="filters.length > 1">
-                  符合一下
-                  <a-select v-model="filterRelation" style="width: 3em">
-                    <a-option value="所有">所有</a-option>
-                    <a-option value="任一">任一</a-option>
-                  </a-select>
-                  条件
+              <a-space direction="vertical" size="large">
+                <div style="display: flex; justify-content: space-between">
+                  <div>设置筛选条件</div>
+                  <div v-show="filters.length > 1">
+                    符合一下
+                    <a-select v-model="filterRelation" style="width: 5em">
+                      <a-option value="所有">所有</a-option>
+                      <a-option value="任一">任一</a-option>
+                    </a-select>
+                    条件
+                  </div>
                 </div>
-              </div>
-              <div v-for="(filter, index) in filters" :key="index">
-                <a-space>
-                  <a-select v-model="filter.colName">
-                    <a-option v-for="(col, i) in filterColNames" :key="`${index}-${i}`" :value="col.dataIndex">
-                      {{ col.title }}
-                    </a-option>
-                  </a-select>
-                  <a-select v-model="filter.relation">
-                    <a-option value="等于">等于</a-option>
-                    <a-option value="不等于">不等于</a-option>
-                    <a-option value="包含">包含</a-option>
-                    <a-option value="不包含">不包含</a-option>
-                    <a-option value="为空">为空</a-option>
-                    <a-option value="不为空">不为空</a-option>
-                  </a-select>
-                  <a-input v-model="filter.value" placeholder="请输入" />
-                  <icon-close @click="() => handleRemoveFilter(index)" />
-                </a-space>
-              </div>
-              <div>
-                <a-button @click="handleAddFilter">
-                  <template #icon>
-                    <icon-plus />
-                  </template>
-                  添加条件
-                </a-button>
-              </div>
-              <div>
-                <a-button size="small" type="text">
-                  <template #icon>
-                    <icon-save />
-                  </template>
-                  另存为新视图
-                </a-button>
-              </div>
+                <div v-for="(filter, index) in filters" :key="index">
+                  <a-row :gutter="12">
+                    <a-col :span="9">
+                      <a-select v-model="filter.colName">
+                        <a-option v-for="(col, i) in filterColNames" :key="`${index}-${i}`" :value="col.dataIndex">
+                          {{ col.title }}
+                        </a-option>
+                      </a-select>
+                    </a-col>
+                    <a-col :span="4">
+                      <a-select v-model="filter.relation">
+                        <a-option value="等于">等于</a-option>
+                        <a-option value="不等于">不等于</a-option>
+                        <a-option value="包含">包含</a-option>
+                        <a-option value="不包含">不包含</a-option>
+                        <a-option value="为空">为空</a-option>
+                        <a-option value="不为空">不为空</a-option>
+                      </a-select>
+                    </a-col>
+                    <a-col :span="9">
+                      <a-input v-model="filter.value" placeholder="请输入" />
+                    </a-col>
+                    <a-col :span="2">
+                      <icon-close @click="() => handleRemoveFilter(index)" />
+                    </a-col>
+                  </a-row>
+                </div>
+                <div>
+                  <a-button @click="handleAddFilter">
+                    <template #icon>
+                      <icon-plus />
+                    </template>
+                    添加条件
+                  </a-button>
+                </div>
+                <div>
+                  <a-button size="small" type="text">
+                    <template #icon>
+                      <icon-save />
+                    </template>
+                    另存为新视图
+                  </a-button>
+                </div>
+              </a-space>
             </section>
           </template>
         </a-popover>
