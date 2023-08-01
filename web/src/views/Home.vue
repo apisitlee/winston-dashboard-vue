@@ -20,48 +20,8 @@
           </a-button>
         </a-space>
       </div>
-      <div class="query-form" v-show="false">
-        <a-form :model="form" layout="inline" size="small" @submit="loadData">
-          <a-form-item field="s">
-            <a-input v-model="form.s" placeholder="模糊搜索日志内容" allow-clear />
-          </a-form-item>
-          <a-form-item field="level">
-            <a-select v-model="form.level" placeholder="日志等级" allow-clear style="width: 120px">
-              <a-option value="info">info</a-option>
-              <a-option value="error">error</a-option>
-            </a-select>
-          </a-form-item>
-          <a-form-item field="range">
-            <a-range-picker v-model="form.range" format="YYYY-MM-DD HH:mm:ss" :placeholder="['开始日期', '结束日期']" allow-clear
-              style="width: 240px" />
-          </a-form-item>
-          <a-form-item field="tag">
-            <a-input-group>
-              <a-select v-model="form.tag[0]" placeholder="标签名称" clearable style="width: 120px">
-                <a-option v-for="tag in tagsDef" :value="tag.slug">
-                  {{ tag.label }}
-                </a-option>
-              </a-select>
-              <a-input v-model="form.tag[1]" placeholder="标签值" clearable style="width: 120px" />
-            </a-input-group>
-          </a-form-item>
-          <a-form-item>
-            <a-space>
-              <a-button html-type="submit" type="primary" :loading="loading">
-                查询
-              </a-button>
-              <a-button html-type="reset" @click="() => handleReset()"> 重置 </a-button>
-              <a-button type="text" @click="() => handleRefresh()">
-                <template #icon>
-                  <icon-refresh />
-                </template>
-              </a-button>
-            </a-space>
-          </a-form-item>
-        </a-form>
-      </div>
-      <a-table :data="tableData" :columns="columns" :pagination="false" :loading="loading" :scroll="{ x: '100%' }"
-        scrollbar bordered stripe column-resizable>
+      <a-table :data="tableData" :columns="columns" :pagination="false" :sticky-header="0" :loading="loading"
+        :scroll="{ x: '100%' }" scrollbar bordered stripe column-resizable>
         <template #_index="{ rowIndex }">{{ rowIndex + 1 }}</template>
         <template #level="{ record }">
           <span :class="record.level">{{ record.level }}</span>
