@@ -147,7 +147,7 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
     router.get('/api/logConfig/list', async (ctx: any) => {
         try {
             // 读取../storage.local/logs文件，获取所有日志源
-            const list = readStorageByLine('logs.txt');
+            const list = readStorageByLine('logs.txt').map((row) => JSON.parse(row));
             ctx.body = {
                 code: 0,
                 msg: 'success',
