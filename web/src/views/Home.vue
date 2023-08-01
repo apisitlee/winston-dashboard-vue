@@ -33,14 +33,14 @@
                 <div v-for="(filter, index) in filters" :key="index">
                   <a-row :gutter="12">
                     <a-col :span="8">
-                      <a-select v-model="filter.colName">
+                      <a-select v-model="filter.colName" style="width: 100%">
                         <a-option v-for="(col, i) in filterColNames" :key="`${index}-${i}`" :value="col.dataIndex">
                           {{ col.title }}
                         </a-option>
                       </a-select>
                     </a-col>
                     <a-col :span="5">
-                      <a-select v-model="filter.relation">
+                      <a-select v-model="filter.relation" style="width: 100%">
                         <a-option value="等于">等于</a-option>
                         <a-option value="不等于">不等于</a-option>
                         <a-option value="包含">包含</a-option>
@@ -50,7 +50,7 @@
                       </a-select>
                     </a-col>
                     <a-col :span="9">
-                      <a-input v-model="filter.value" placeholder="请输入" />
+                      <a-input v-model="filter.value" placeholder="请输入" style="width: 100%" />
                     </a-col>
                     <a-col :span="2">
                       <a-button type="text" status="danger" @click="() => handleRemoveFilter(index)">
@@ -62,7 +62,7 @@
                   </a-row>
                 </div>
                 <div>
-                  <a-button @click="handleAddFilter">
+                  <a-button type="text" @click="handleAddFilter">
                     <template #icon>
                       <icon-plus />
                     </template>
