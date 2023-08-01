@@ -182,9 +182,14 @@ onMounted(async () => {
   setCustomColumnsByConfig();
 });
 
-function handleRefresh() {
+async function handleRefresh() {
   form.value.refresh = true;
-  loadData();
+  try {
+    await loadData();
+  } catch (e) {
+    console.log(e);
+  }
+  form.value.refresh = false;
 }
 function handleReset() {
   form.value = {
