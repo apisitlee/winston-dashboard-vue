@@ -77,6 +77,9 @@
                 <a-option value="业务标签">业务标签</a-option>
               </a-select>
             </template>
+            <template #enum="{ record }">
+              <a-input v-model="record.enum" placeholder="逗号分隔" v-show="record.type === '枚举'" />
+            </template>
             <template #width="{ record }">
               <div style="display: flex; align-items: center">
                 <a-input-number v-model="record.width" placeholder="列宽" />
@@ -130,6 +133,7 @@ type CustomColumn = {
   title: string;
   dataIndex: string;
   type: string;
+  enum: string;
   width?: number;
   fixed: string;
   ellipsis: boolean;
@@ -154,7 +158,7 @@ const form = ref<FormData>({
   logPath: "",
   logFilename: "",
   tags: [{ label: "", slug: "" }],
-  customColumns: [{ title: "", dataIndex: "", type: '文本', width: 200, fixed: "", ellipsis: true }],
+  customColumns: [{ title: "", dataIndex: "", type: '文本', enum: '', width: 200, fixed: "", ellipsis: true }],
 });
 const rules = ref({
   name: [
@@ -220,19 +224,25 @@ const customColumnsColumns = ref([
     title: "列名称 (必填)",
     dataIndex: "title",
     slotName: "title",
-    width: 200,
+    width: 150,
   },
   {
     title: "字段名 (必填)",
     dataIndex: "dataIndex",
     slotName: "dataIndex",
-    width: 200,
+    width: 150,
   },
   {
     title: "类型",
     dataIndex: "type",
     slotName: "type",
-    width: 150,
+    width: 120,
+  },
+  {
+    title: "枚举",
+    dataIndex: "enum",
+    slotName: "enum",
+    width: 200,
   },
   {
     title: "列宽",
@@ -244,13 +254,13 @@ const customColumnsColumns = ref([
     title: "固定列",
     dataIndex: "fixed",
     slotName: "fixed",
-    width: 200,
+    width: 180,
   },
   {
     title: "文本省略",
     dataIndex: "ellipsis",
     slotName: "ellipsis",
-    width: 250,
+    width: 230,
   },
   {
     title: "",
@@ -376,6 +386,7 @@ function onClickAddCustomColumn() {
     title: "",
     dataIndex: "",
     type: '文本',
+    enum: '',
     width: 200,
     fixed: "",
     ellipsis: true,
