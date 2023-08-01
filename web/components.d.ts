@@ -19,6 +19,7 @@ declare module 'vue' {
     AModal: typeof import('@arco-design/web-vue')['Modal']
     AOption: typeof import('@arco-design/web-vue')['Option']
     APagination: typeof import('@arco-design/web-vue')['Pagination']
+    APopover: typeof import('@arco-design/web-vue')['Popover']
     ARadio: typeof import('@arco-design/web-vue')['Radio']
     ARadioGroup: typeof import('@arco-design/web-vue')['RadioGroup']
     ARangePicker: typeof import('@arco-design/web-vue')['RangePicker']
