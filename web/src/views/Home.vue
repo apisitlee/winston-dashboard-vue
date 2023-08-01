@@ -201,11 +201,7 @@ const filters = ref<any[]>([]);
 const filterRelation = ref("所有");
 const filterColNames = computed(() => {
   const list = columns.value.filter((item: any) => {
-    if (item.dataIndex !== "_index") return true;
-    if (item.dataIndex !== "level") return true;
-    if (item.dataIndex !== "timestamp") return true;
-    if (item.dataIndex !== "action") return true;
-    return false;
+    return !["#", "日志等级", "记录时间", "操作"].includes(item.title);
   });
   return list;
 });
