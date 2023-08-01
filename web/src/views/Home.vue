@@ -269,16 +269,6 @@ function onClickItem(record: any, index: number) {
   padding: 0 8px;
 }
 
-.max-3-lines {
-  width: 100%;
-  max-height: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-}
-
 .log-table-foot {
   width: 100%;
   background-color: #165dff;
@@ -296,5 +286,15 @@ function onClickItem(record: any, index: number) {
 <style>
 .log-table .arco-form-item-layout-inline {
   margin-right: 0;
+}
+
+.max-3-lines .arco-table-td-content {
+  width: 100%;
+  max-height: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 </style>
