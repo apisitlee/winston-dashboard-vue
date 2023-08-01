@@ -23,7 +23,7 @@
                   <div>设置筛选条件</div>
                   <div v-show="filters.length > 1">
                     符合一下
-                    <a-select v-model="filterRelation" style="width: 5em">
+                    <a-select v-model="filterRelation" style="width: 6em">
                       <a-option value="所有">所有</a-option>
                       <a-option value="任一">任一</a-option>
                     </a-select>
@@ -32,14 +32,14 @@
                 </div>
                 <div v-for="(filter, index) in filters" :key="index">
                   <a-row :gutter="12">
-                    <a-col :span="9">
+                    <a-col :span="8">
                       <a-select v-model="filter.colName">
                         <a-option v-for="(col, i) in filterColNames" :key="`${index}-${i}`" :value="col.dataIndex">
                           {{ col.title }}
                         </a-option>
                       </a-select>
                     </a-col>
-                    <a-col :span="4">
+                    <a-col :span="5">
                       <a-select v-model="filter.relation">
                         <a-option value="等于">等于</a-option>
                         <a-option value="不等于">不等于</a-option>
@@ -53,7 +53,11 @@
                       <a-input v-model="filter.value" placeholder="请输入" />
                     </a-col>
                     <a-col :span="2">
-                      <icon-close @click="() => handleRemoveFilter(index)" />
+                      <a-button type="text" status="danger" @click="() => handleRemoveFilter(index)">
+                        <template #icon>
+                          <icon-close />
+                        </template>
+                      </a-button>
                     </a-col>
                   </a-row>
                 </div>
