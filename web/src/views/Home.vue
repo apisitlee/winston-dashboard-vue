@@ -81,17 +81,24 @@ import { Modal } from "@arco-design/web-vue";
 // @ts-ignore
 import DetailModal from "./components/DetailModal.vue";
 import dayjs from "dayjs";
+import { computed } from "vue";
 
 const logConfigs = ref<any>([]);
 const tableData = ref<any>([]);
-const columns = ref([
+const columnsBefore = ref([
   { title: "#", slotName: "_index", width: 80 },
   { title: "日志等级", slotName: "level", width: 100 },
   { title: "日志内容", slotName: "message", cellClass: "max-3-lines" },
   { title: "业务标签", slotName: "tags" },
+]);
+const columnsAfter = ref([
   { title: "记录时间", dataIndex: "timestamp", width: 180 },
   { title: "操作", slotName: "action", width: 100 },
 ]);
+const customColumns = ref([]);
+const columns = computed(() => {
+  return [...columnsBefore.value, ...customColumns.value, ...columnsAfter.value];
+});
 const loading = ref(false);
 const pagination = ref({
   hasNext: false,
@@ -220,6 +227,7 @@ async function onChangeSource(ev: any) {
       throw data.msg;
     }
     setTagsByConfig();
+    setCustomColumnsByConfig();
     await loadData();
   } catch (e) {
     console.error(e);
@@ -242,6 +250,15 @@ function setTagsByConfig() {
   }
   tagsDef.value = list;
   tagsMap.value = map;
+}
+function setCustomColumnsByConfig() {
+  const config = logConfigs.value.find((conf: any) => conf.id === active.value);
+  if (config) {
+    customColumns.value = (config.customColumns || []).map((col) => {
+      col.dataIndex = `message.${col.dataIndex}`;
+      return col;
+    });
+  }
 }
 
 function onClickItem(record: any, index: number) {
