@@ -69,6 +69,14 @@
             <template #dataIndex="{ record }">
               <a-input v-model="record.dataIndex" placeholder="字段名" />
             </template>
+            <template #type="{ record }">
+              <a-select v-model="record.type" placeholder="类型">
+                <a-option value="文本">文本</a-option>
+                <a-option value="枚举">枚举</a-option>
+                <a-option value="时间">时间</a-option>
+                <a-option value="业务标签">业务标签</a-option>
+              </a-select>
+            </template>
             <template #width="{ record }">
               <div style="display: flex; align-items: center">
                 <a-input-number v-model="record.width" placeholder="列宽" />
@@ -121,6 +129,7 @@ type Tag = {
 type CustomColumn = {
   title: string;
   dataIndex: string;
+  type: string;
   width?: number;
   fixed: string;
   ellipsis: boolean;
@@ -145,7 +154,7 @@ const form = ref<FormData>({
   logPath: "",
   logFilename: "",
   tags: [{ label: "", slug: "" }],
-  customColumns: [{ title: "", dataIndex: "", width: 200, fixed: "", ellipsis: true }],
+  customColumns: [{ title: "", dataIndex: "", type: '文本', width: 200, fixed: "", ellipsis: true }],
 });
 const rules = ref({
   name: [
@@ -218,6 +227,12 @@ const customColumnsColumns = ref([
     dataIndex: "dataIndex",
     slotName: "dataIndex",
     width: 200,
+  },
+  {
+    title: "类型",
+    dataIndex: "type",
+    slotName: "type",
+    width: 150,
   },
   {
     title: "列宽",
@@ -360,6 +375,7 @@ function onClickAddCustomColumn() {
   form.value.customColumns.push({
     title: "",
     dataIndex: "",
+    type: '文本',
     width: 200,
     fixed: "",
     ellipsis: true,

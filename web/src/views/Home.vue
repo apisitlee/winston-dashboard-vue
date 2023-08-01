@@ -50,7 +50,7 @@
                       </a-select>
                     </a-col>
                     <a-col :span="9">
-                      <a-input v-model="filter.value" placeholder="请输入" style="width: 100%" />
+                      <a-input v-model="filter.value" placeholder="请输入" allow-clear style="width: 100%" />
                     </a-col>
                     <a-col :span="2">
                       <a-button type="text" status="danger" @click="() => handleRemoveFilter(index)">
