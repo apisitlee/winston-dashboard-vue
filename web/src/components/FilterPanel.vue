@@ -1,6 +1,6 @@
 <template>
     <a-popover trigger="click" position="bl">
-        <a-button type="text">
+        <a-button :type="filterNum ? 'primary' : 'text'">
             <template #icon>
                 <icon-filter />
             </template>
@@ -125,11 +125,11 @@ function handleRemoveFilter(index: number) {
 .filter-pop-header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 24px;
+    margin-bottom: 15px;
 }
 
 .filter-pop-body {
-    max-height: 400px;
+    max-height: 280px;
     overflow: auto;
 }
 
@@ -144,6 +144,16 @@ function handleRemoveFilter(index: number) {
 .filter-pop-footer {
     display: flex;
     justify-content: space-between;
-    margin-top: 24px;
+    margin-top: 15px;
+}
+</style>
+
+<style>
+.filter-row .arco-select-view-single,
+.filter-row .arco-input-wrapper {
+    background-color: transparent;
+    border-color: #dddddd;
+    padding-left: 6px;
+    padding-right: 6px;
 }
 </style>
