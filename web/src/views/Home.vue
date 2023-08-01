@@ -29,18 +29,24 @@
                   条件
                 </div>
               </div>
-              <div v-for="(filter, i) in filters" :key="i">
-                <a-select v-model="filter.colName"></a-select>
-                <a-select v-model="filter.relation">
-                  <a-option value="等于">等于</a-option>
-                  <a-option value="不等于">不等于</a-option>
-                  <a-option value="包含">包含</a-option>
-                  <a-option value="不包含">不包含</a-option>
-                  <a-option value="为空">为空</a-option>
-                  <a-option value="不为空">不为空</a-option>
-                </a-select>
-                <a-input v-model="filter.value" placeholder="请输入" />
-                <IconClose @click="() => handleRemoveFilter(i)" />
+              <div v-for="(filter, index) in filters" :key="index">
+                <a-space>
+                  <a-select v-model="filter.colName">
+                    <a-option v-for="(col, i) in filterColNames" :key="`${index}-${i}`" :value="col.dataIndex">
+                      {{ col.title }}
+                    </a-option>
+                  </a-select>
+                  <a-select v-model="filter.relation">
+                    <a-option value="等于">等于</a-option>
+                    <a-option value="不等于">不等于</a-option>
+                    <a-option value="包含">包含</a-option>
+                    <a-option value="不包含">不包含</a-option>
+                    <a-option value="为空">为空</a-option>
+                    <a-option value="不为空">不为空</a-option>
+                  </a-select>
+                  <a-input v-model="filter.value" placeholder="请输入" />
+                  <icon-close @click="() => handleRemoveFilter(index)" />
+                </a-space>
               </div>
               <div>
                 <a-button @click="handleAddFilter">
@@ -95,7 +101,7 @@
               <a-button html-type="reset" @click="() => handleReset()"> 重置 </a-button>
               <a-button type="text" @click="() => handleRefresh()">
                 <template #icon>
-                  <IconRefresh />
+                  <icon-refresh />
                 </template>
               </a-button>
             </a-space>
@@ -139,7 +145,13 @@ import { onMounted, ref, computed, ComputedRef } from "vue";
 import { Modal } from "@arco-design/web-vue";
 // @ts-ignore
 import DetailModal from "./components/DetailModal.vue";
-import { IconFilter, IconPlus, IconSave } from "@arco-design/web-vue/es/icon";
+import {
+  IconFilter,
+  IconPlus,
+  IconSave,
+  IconClose,
+  IconRefresh,
+} from "@arco-design/web-vue/es/icon";
 
 const logConfigs = ref<any>([]);
 const tableData = ref<any>([]);
@@ -181,6 +193,16 @@ const pagination = ref({
 });
 const filters = ref<any[]>([]);
 const filterRelation = ref("所有");
+const filterColNames = computed(() => {
+  const list = columns.value.filter((item: any) => {
+    if (item.dataIndex !== "_index") return false;
+    if (item.dataIndex !== "level") return false;
+    if (item.dataIndex !== "timestamp") return false;
+    if (item.dataIndex !== "action") return false;
+    return true;
+  });
+  return list;
+});
 const form = ref({
   level: "",
   s: "",
