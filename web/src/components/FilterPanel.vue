@@ -11,8 +11,8 @@
                 <div class="filter-pop-header">
                     <div>设置筛选条件</div>
                     <div v-show="filterList.length > 1">
-                        符合一下
-                        <a-select v-model="filterRelation" size="small">
+                        符合以下
+                        <a-select v-model="filterRelation" size="small" @change="handleRelationChange">
                             <a-option value="所有">所有</a-option>
                             <a-option value="任一">任一</a-option>
                         </a-select>
@@ -103,17 +103,17 @@ import { ref, computed, watch } from "vue";
 
 type Props = {
     filters: any[];
-    filterRelation: string;
+    relation: string;
     columns: any[];
     tags: any[];
     filterColNames: any[];
 };
 const props = withDefaults(defineProps<Props>(), {
-    filterRelation: "所有",
+    relation: "所有",
 });
 const filterList = ref<any[]>([]);
 const filterNum = computed(() => props.filters.length);
-// const filterRelation = ref("所有");
+const filterRelation = ref("所有");
 // 针对不同类型，关系列表不同
 const relations: Record<string, any[]> = {
     文本: ["等于", "不等于", "包含", "不包含", "为空", "不为空"],
@@ -132,10 +132,14 @@ const relationKeyMap: Record<string, string> = {
     早于: "pt",
 };
 
-const emit = defineEmits(["query", "reset"]);
+const emit = defineEmits(["query", "reset", "relation-change"]);
 
 watch(props.filters, () => {
     filterList.value = props.filters;
+});
+
+watch([props.relation], () => {
+    filterRelation.value = props.relation;
 });
 
 function getColTypeByName(colName: string) {
@@ -167,8 +171,11 @@ function handleRemoveFilter(index: number) {
     filterList.value.splice(index, 1);
 }
 
+function handleRelationChange() {
+    emit("relation-change", filterRelation.value);
+}
+
 function handleQuery() {
-    console.log("filterList: ", filterList.value);
     let list: any[] = [];
     Array.from(filterList.value).map((row: any) => {
         const column = props.columns.find((col) => col.title === row.colName);
@@ -204,7 +211,6 @@ function handleQuery() {
             }
         }
     });
-    console.log("处理后: ", list);
     emit("query", list);
 }
 function handleReset() {

@@ -24,7 +24,7 @@ export const LogicUtils = {
                 try {
                     pass = source.includes(target);
                 } catch (e: any) {
-                    console.log(e);
+                    // console.log(e);
                 }
                 break;
             case 'nc': // 不包含
@@ -38,7 +38,6 @@ export const LogicUtils = {
                 pass = source === '' || source === null || source === undefined;
                 break;
             case 'nn': // 不为空
-                console.log('\n\n不为空吗？\n', source, typeof source);
                 pass = source !== '' && source !== null && source !== undefined;
                 break;
             case 'lt': // 晚于

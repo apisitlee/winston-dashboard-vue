@@ -10,8 +10,9 @@
       </div>
       <div style="margin: 12px 0">
         <a-space>
-          <FilterPanel :filters="filters" :filter-relation="filterRelation" :columns="columns" :tags="tagsDef"
-            :filter-col-names="filterColNames" @query="handleQuery" @reset="handleReset" />
+          <FilterPanel :filters="filters" :relation="filterRelation" :columns="columns" :tags="tagsDef"
+            :filter-col-names="filterColNames" @relation-change="handleRelationChange" @query="handleQuery"
+            @reset="handleReset" />
           <a-button type="text" :loading="loading" @click="() => handleRefresh()">
             <template #icon>
               <icon-refresh />
@@ -192,6 +193,9 @@ async function handleRefresh() {
     console.log(e);
   }
   form.value.refresh = false;
+}
+function handleRelationChange(newRelation: string) {
+  filterRelation.value = newRelation;
 }
 async function handleQuery(filterList: any[]) {
   filters.value = filterList;
