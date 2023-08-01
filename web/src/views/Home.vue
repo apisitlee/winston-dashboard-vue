@@ -254,7 +254,7 @@ function setTagsByConfig() {
 function setCustomColumnsByConfig() {
   const config = logConfigs.value.find((conf: any) => conf.id === active.value);
   if (config) {
-    customColumns.value = (config.customColumns || []).map((col) => {
+    customColumns.value = (config.customColumns || []).map((col: any) => {
       col.dataIndex = `message.${col.dataIndex}`;
       return col;
     });
