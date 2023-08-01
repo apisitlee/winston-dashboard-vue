@@ -31,6 +31,7 @@ declare module 'vue' {
     ASplit: typeof import('@arco-design/web-vue')['Split']
     ATable: typeof import('@arco-design/web-vue')['Table']
     ATag: typeof import('@arco-design/web-vue')['Tag']
+    FilterPanel: typeof import('./src/components/FilterPanel.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

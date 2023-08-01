@@ -9,78 +9,7 @@
         </a-radio-group>
       </div>
       <div>
-        <a-popover trigger="click" position="bl">
-          <a-button type="text">
-            <template #icon>
-              <icon-filter />
-            </template>
-            筛选
-          </a-button>
-          <template #content>
-            <section style="width: 500px; max-height: 350px; overflow: auto">
-              <a-space direction="vertical" size="large">
-                <div style="display: flex; justify-content: space-between">
-                  <div>设置筛选条件</div>
-                  <div v-show="filters.length > 1">
-                    符合一下
-                    <a-select v-model="filterRelation" style="width: 6em">
-                      <a-option value="所有">所有</a-option>
-                      <a-option value="任一">任一</a-option>
-                    </a-select>
-                    条件
-                  </div>
-                </div>
-                <div v-for="(filter, index) in filters" :key="index">
-                  <a-row :gutter="12">
-                    <a-col :span="8">
-                      <a-select v-model="filter.colName" style="width: 100%">
-                        <a-option v-for="(col, i) in filterColNames" :key="`${index}-${i}`" :value="col.dataIndex">
-                          {{ col.title }}
-                        </a-option>
-                      </a-select>
-                    </a-col>
-                    <a-col :span="5">
-                      <a-select v-model="filter.relation" style="width: 100%">
-                        <a-option value="等于">等于</a-option>
-                        <a-option value="不等于">不等于</a-option>
-                        <a-option value="包含">包含</a-option>
-                        <a-option value="不包含">不包含</a-option>
-                        <a-option value="为空">为空</a-option>
-                        <a-option value="不为空">不为空</a-option>
-                      </a-select>
-                    </a-col>
-                    <a-col :span="9">
-                      <a-input v-model="filter.value" placeholder="请输入" allow-clear style="width: 100%" />
-                    </a-col>
-                    <a-col :span="2">
-                      <a-button type="text" status="danger" @click="() => handleRemoveFilter(index)">
-                        <template #icon>
-                          <icon-close />
-                        </template>
-                      </a-button>
-                    </a-col>
-                  </a-row>
-                </div>
-                <div>
-                  <a-button type="text" @click="handleAddFilter">
-                    <template #icon>
-                      <icon-plus />
-                    </template>
-                    添加条件
-                  </a-button>
-                </div>
-                <div>
-                  <a-button size="small" type="text">
-                    <template #icon>
-                      <icon-save />
-                    </template>
-                    另存为新视图
-                  </a-button>
-                </div>
-              </a-space>
-            </section>
-          </template>
-        </a-popover>
+        <FilterPanel :filters="filters" :columns="columns" :filter-col-names="filterColNames" />
       </div>
       <div class="query-form">
         <a-form :model="form" layout="inline" size="small" @submit="loadData">
@@ -160,12 +89,9 @@ import { Modal } from "@arco-design/web-vue";
 // @ts-ignore
 import DetailModal from "./components/DetailModal.vue";
 import {
-  IconFilter,
-  IconPlus,
-  IconSave,
-  IconClose,
   IconRefresh,
 } from "@arco-design/web-vue/es/icon";
+import FilterPanel from "../components/FilterPanel.vue";
 
 const logConfigs = ref<any>([]);
 const tableData = ref<any>([]);
@@ -212,7 +138,6 @@ const pagination = ref({
   total: 0,
 });
 const filters = ref<any[]>([]);
-const filterRelation = ref("所有");
 const filterColNames = computed(() => {
   const list = columns.value.filter((item: any) => {
     return !["#", "日志等级", "记录时间", "操作"].includes(item.title);
@@ -238,17 +163,6 @@ onMounted(async () => {
   setCustomColumnsByConfig();
 });
 
-function handleAddFilter() {
-  const newFilter = {
-    colName: "",
-    relation: "等于",
-    value: "",
-  };
-  filters.value.push(newFilter);
-}
-function handleRemoveFilter(index: number) {
-  filters.value.splice(index, 1);
-}
 function handleRefresh() {
   form.value.refresh = true;
   loadData();
