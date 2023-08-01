@@ -4,7 +4,7 @@
             <template #icon>
                 <icon-filter />
             </template>
-            {{ filterNum ? `${filterNum} ` : '' }}筛选
+            {{ filterNum ? `${filterNum} ` : "" }}筛选
         </a-button>
         <template #content>
             <section class="filter-pop-box">
@@ -19,33 +19,36 @@
                         条件
                     </div>
                 </div>
-                <div v-for="(filter, index) in filters" :key="index">
-                    <a-row :gutter="12">
-                        <a-col :span="8">
-                            <a-select v-model="filter.colName" placeholder="请选择字段" style="width: 100%">
-                                <a-option v-for="(col, i) in filterColNames" :key="`${index}-${i}`" :value="col.dataIndex">
-                                    {{ col.title }}
-                                </a-option>
-                            </a-select>
-                        </a-col>
-                        <a-col :span="5">
-                            <a-select v-model="filter.relation" style="width: 100%">
-                                <a-option v-for="relation in getColRelations(filter.colName)" :value="relation">
-                                    {{ relation }}
-                                </a-option>
-                            </a-select>
-                        </a-col>
-                        <a-col :span="9">
-                            <a-input v-model="filter.value" placeholder="请输入" allow-clear style="width: 100%" />
-                        </a-col>
-                        <a-col :span="2">
-                            <a-button type="text" status="danger" @click="() => handleRemoveFilter(index)">
-                                <template #icon>
-                                    <icon-close />
-                                </template>
-                            </a-button>
-                        </a-col>
-                    </a-row>
+                <div class="filter-pop-body">
+                    <div class="filter-row" v-for="(filter, index) in filters" :key="index">
+                        <a-row :gutter="12">
+                            <a-col :span="8">
+                                <a-select v-model="filter.colName" placeholder="请选择字段" style="width: 100%">
+                                    <a-option v-for="(col, i) in filterColNames" :key="`${index}-${i}`"
+                                        :value="col.dataIndex">
+                                        {{ col.title }}
+                                    </a-option>
+                                </a-select>
+                            </a-col>
+                            <a-col :span="5">
+                                <a-select v-model="filter.relation" style="width: 100%">
+                                    <a-option v-for="relation in getColRelations(filter.colName)" :value="relation">
+                                        {{ relation }}
+                                    </a-option>
+                                </a-select>
+                            </a-col>
+                            <a-col :span="9">
+                                <a-input v-model="filter.value" placeholder="请输入" allow-clear style="width: 100%" />
+                            </a-col>
+                            <a-col :span="2">
+                                <a-button type="text" status="danger" @click="() => handleRemoveFilter(index)">
+                                    <template #icon>
+                                        <icon-close />
+                                    </template>
+                                </a-button>
+                            </a-col>
+                        </a-row>
+                    </div>
                 </div>
                 <div class="filter-pop-footer">
                     <a-button type="text" @click="handleAddFilter">
@@ -67,36 +70,31 @@
 </template>
 
 <script setup lang="ts">
-import {
-    IconFilter,
-    IconPlus,
-    IconSave,
-    IconClose,
-} from '@arco-design/web-vue/es/icon';
-import { ref, computed } from 'vue';
+import { IconFilter, IconPlus, IconSave, IconClose } from "@arco-design/web-vue/es/icon";
+import { ref, computed } from "vue";
 
 type Props = {
-    filters: any[]
-    columns: any[]
-    filterColNames: any[]
-}
+    filters: any[];
+    columns: any[];
+    filterColNames: any[];
+};
 const props = withDefaults(defineProps<Props>(), {});
 const filterNum = computed(() => props.filters.length);
-const filterRelation = ref('所有');
+const filterRelation = ref("所有");
 // 针对不同类型，关系列表不同
 const relations: Record<string, any[]> = {
-    '文本': ['等于', '不等于', '包含', '不包含', '为空', '不为空'],
-    '枚举': ['等于', '不等于', '包含', '不包含', '为空', '不为空'],
-    '时间': ['等于', '晚于', '早于', '为空', '不为空'],
-    '业务标签': ['等于', '不等于', '包含', '不包含', '为空', '不为空'],
+    文本: ["等于", "不等于", "包含", "不包含", "为空", "不为空"],
+    枚举: ["等于", "不等于", "包含", "不包含", "为空", "不为空"],
+    时间: ["等于", "晚于", "早于", "为空", "不为空"],
+    业务标签: ["等于", "不等于", "包含", "不包含", "为空", "不为空"],
 };
 
 function getColTypeByName(colName: string) {
     const { type } = props.columns.find((col) => col.title === colName) || {};
-    return type || '文本';
+    return type || "文本";
 }
 function getColRelations(colName: string): any[] {
-    const type = getColTypeByName(colName)
+    const type = getColTypeByName(colName);
     if (type in relations) {
         return relations[type];
     } else {
@@ -120,25 +118,30 @@ function handleRemoveFilter(index: number) {
 <style scoped>
 .filter-pop-box {
     width: 650px;
-    max-height: 350px;
-    overflow: auto;
+    height: auto;
+    overflow: hidden;
 }
 
 .filter-pop-header {
-    position: sticky;
-    top: 0;
-    background-color: #f7f8f9;
-    z-index: 100;
     display: flex;
     justify-content: space-between;
     margin-bottom: 24px;
 }
 
+.filter-pop-body {
+    max-height: 400px;
+    overflow: auto;
+}
+
+.filter-row {
+    width: 100%;
+}
+
+.filter-row+.filter-row {
+    margin-top: 12px;
+}
+
 .filter-pop-footer {
-    position: sticky;
-    bottom: 0;
-    background-color: #f8f9f0;
-    z-index: 100;
     display: flex;
     justify-content: space-between;
     margin-top: 24px;
