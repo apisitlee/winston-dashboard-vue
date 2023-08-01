@@ -50,7 +50,7 @@
           <span :class="record.level">{{ record.level }}</span>
         </template>
         <template #message="{ record }">
-          <div class="max-3-lines">{{ JSON.stringify(record.message) }}</div>
+          {{ JSON.stringify(record.message) }}
         </template>
         <template #tags="{ record, rowIndex }">
           <a-space wrap>
@@ -87,7 +87,7 @@ const tableData = ref<any>([]);
 const columns = ref([
   { title: "#", slotName: "_index", width: 80 },
   { title: "日志等级", slotName: "level", width: 100 },
-  { title: "日志内容", slotName: "message" },
+  { title: "日志内容", slotName: "message", cellClass: "max-3-lines" },
   { title: "业务标签", slotName: "tags" },
   { title: "记录时间", dataIndex: "timestamp", width: 180 },
   { title: "操作", slotName: "action", width: 100 },
@@ -269,6 +269,16 @@ function onClickItem(record: any, index: number) {
   padding: 0 8px;
 }
 
+.max-3-lines {
+  width: 100%;
+  max-height: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
 .log-table-foot {
   width: 100%;
   background-color: #165dff;
@@ -286,15 +296,5 @@ function onClickItem(record: any, index: number) {
 <style>
 .log-table .arco-form-item-layout-inline {
   margin-right: 0;
-}
-
-.log-table .max-3-lines {
-  width: 100%;
-  max-height: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
 }
 </style>
