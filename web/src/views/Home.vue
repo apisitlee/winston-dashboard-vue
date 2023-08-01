@@ -8,6 +8,20 @@
           </a-radio>
         </a-radio-group>
       </div>
+      <div>
+        <a-popover trigger="click" title="设置筛选条件" position="bl">
+          <a-button type="text" :icon="IconFilter">筛选</a-button>
+          <template #content>
+            <div></div>
+            <div>
+              <a-button :icon="IconPlus">添加条件</a-button>
+            </div>
+            <div>
+              <a-button size="small" type="text" :icon="IconSave">另存为视图</a-button>
+            </div>
+          </template>
+        </a-popover>
+      </div>
       <div class="query-form">
         <a-form :model="form" layout="inline" size="small" @submit="loadData">
           <a-form-item field="s">
@@ -20,7 +34,7 @@
             </a-select>
           </a-form-item>
           <a-form-item field="range">
-            <a-range-picker v-model="form.range" format="YYYY-MM-DD" :placeholder="['开始日期', '结束日期']" allow-clear
+            <a-range-picker v-model="form.range" format="YYYY-MM-DD HH:mm:ss" :placeholder="['开始日期', '结束日期']" allow-clear
               style="width: 240px" />
           </a-form-item>
           <a-form-item field="tag">
@@ -39,7 +53,7 @@
                 查询
               </a-button>
               <a-button html-type="reset" @click="() => handleReset()"> 重置 </a-button>
-              <a-button type="primary" text @click="() => handleRefresh()">刷新</a-button>
+              <a-button type="text" @click="() => handleRefresh()">刷新缓存</a-button>
             </a-space>
           </a-form-item>
         </a-form>
@@ -81,7 +95,7 @@ import { onMounted, ref, computed, ComputedRef } from "vue";
 import { Modal } from "@arco-design/web-vue";
 // @ts-ignore
 import DetailModal from "./components/DetailModal.vue";
-import dayjs from "dayjs";
+import { IconFilter, IconPlus, IconSave } from "@arco-design/web-vue/es/icon";
 
 const logConfigs = ref<any>([]);
 const tableData = ref<any>([]);
@@ -124,7 +138,7 @@ const pagination = ref({
 const form = ref({
   level: "",
   s: "",
-  range: [dayjs().format("YYYY-MM-DD HH:mm:00"), dayjs().format("YYYY-MM-DD HH:mm:59")],
+  range: [],
   tag: [],
   refresh: false,
 });
@@ -315,6 +329,7 @@ function onClickItem(record: any, index: number) {
   position: sticky;
   bottom: 0;
   padding: 12px;
+  z-index: 100;
   box-sizing: border-box;
   border-top: 1px solid #dddddd;
 }
