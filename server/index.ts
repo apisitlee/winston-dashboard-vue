@@ -284,11 +284,12 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
                 }
             }
         } catch (e: any) {
+            console.log(e);
             ctx.body = {
                 code: 1,
                 msg: 'Server Error',
                 data: {},
-                e: e,
+                e: typeof e === 'object' ? JSON.stringify(e) : e,
             }
         }
     });
