@@ -39,12 +39,13 @@
                 查询
               </a-button>
               <a-button html-type="reset" @click="() => handleReset()"> 重置 </a-button>
+              <a-button type="primary" text @click="() => handleRefresh()">刷新</a-button>
             </a-space>
           </a-form-item>
         </a-form>
       </div>
-      <a-table :data="tableData" :columns="columns" :pagination="false" :loading="loading" bordered stripe
-        column-resizable>
+      <a-table :data="tableData" :columns="columns" :pagination="false" :loading="loading" :scroll="{ x: '100%' }"
+        scrollbar bordered stripe column-resizable>
         <template #_index="{ rowIndex }">{{ rowIndex + 1 }}</template>
         <template #level="{ record }">
           <span :class="record.level">{{ record.level }}</span>
@@ -76,27 +77,26 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed, ComputedRef } from "vue";
 import { Modal } from "@arco-design/web-vue";
 // @ts-ignore
 import DetailModal from "./components/DetailModal.vue";
 import dayjs from "dayjs";
-import { computed } from "vue";
 
 const logConfigs = ref<any>([]);
 const tableData = ref<any>([]);
 const columnsBefore = ref([
-  { title: "#", slotName: "_index", width: 80 },
+  { title: "#", slotName: "_index", width: 80, fixed: "left" },
   { title: "日志等级", slotName: "level", width: 100 },
-  { title: "日志内容", slotName: "message", cellClass: "max-3-lines" },
-  { title: "业务标签", slotName: "tags" },
+  { title: "日志内容", slotName: "message", cellClass: "max-3-lines", width: 300 },
+  { title: "业务标签", slotName: "tags", width: 200 },
 ]);
 const columnsAfter = ref([
   { title: "记录时间", dataIndex: "timestamp", width: 180 },
-  { title: "操作", slotName: "action", width: 100 },
+  { title: "操作", slotName: "action", width: 100, fixed: "right" },
 ]);
 const customColumns = ref([]);
-const columns = computed(() => {
+const columns: ComputedRef<any[]> = computed(() => {
   return [...columnsBefore.value, ...customColumns.value, ...columnsAfter.value];
 });
 const loading = ref(false);
@@ -113,6 +113,7 @@ const form = ref({
   s: "",
   range: [dayjs().format("YYYY-MM-DD HH:mm:00"), dayjs().format("YYYY-MM-DD HH:mm:59")],
   tag: [],
+  refresh: false,
 });
 const active = ref("");
 const tagsDef = ref<any>([]);
@@ -123,14 +124,20 @@ onMounted(async () => {
   await getActive();
   await loadData();
   setTagsByConfig();
+  setCustomColumnsByConfig();
 });
 
+function handleRefresh() {
+  form.value.refresh = true;
+  loadData();
+}
 function handleReset() {
   form.value = {
     s: "",
     level: "",
     range: [],
     tag: [],
+    refresh: false,
   };
   loadData();
 }
