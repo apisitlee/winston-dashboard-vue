@@ -22,23 +22,23 @@ export const LogicUtils = {
                 break;
             case 'c': // 包含
                 try {
-                    pass = target.includes(source);
+                    pass = source.includes(target);
                 } catch (e: any) {
-                    // console.log(e);
+                    console.log(e);
                 }
                 break;
             case 'nc': // 不包含
                 try {
-                    pass = !target.includes(source);
+                    pass = !source.includes(target);
                 } catch (e: any) {
                     // console.log(e);
                 }
                 break;
             case 'n': // 为空
-                pass = source === '' || source === null || source === undefined;
+                pass = target === '' || target === null || target === undefined;
                 break;
             case 'nn': // 不为空
-                pass = source !== '' && source !== null && source !== undefined;
+                pass = target !== '' && target !== null && target !== undefined;
                 break;
             case 'lt': // 晚于
                 try {
