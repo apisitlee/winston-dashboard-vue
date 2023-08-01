@@ -13,7 +13,6 @@ function streamReadFiles(config: any) {
             const fileReadPromises = fileList.map((filename) => {
                 return new Promise((resolve, reject) => {
                     if (regex.test(filename)) {
-                        console.log('符合：', filename);
                         const filePath = path.join(logPath, filename);
                         const stream = fs.createReadStream(filePath, 'utf8');
                         let content = '';
@@ -23,7 +22,6 @@ function streamReadFiles(config: any) {
                         });
 
                         stream.on('end', () => {
-                            console.log('读完了', filename);
                             fileContents.push(content);
                             resolve(true);
                         });
@@ -32,7 +30,6 @@ function streamReadFiles(config: any) {
                             reject(error);
                         });
                     } else {
-                        console.log('不符合', filename);
                         resolve(false);
                     }
                 });
@@ -80,7 +77,6 @@ export async function fileFinder(readStorage: (filename: string) => string, onUp
     }, 60 * 1000);
 
     async function flush() {
-        console.log('flush');
         onUpdate(await find());
     }
 
