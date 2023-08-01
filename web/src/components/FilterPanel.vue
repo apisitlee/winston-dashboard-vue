@@ -10,7 +10,7 @@
             <section class="filter-pop-box">
                 <div class="filter-pop-header">
                     <div>设置筛选条件</div>
-                    <div v-show="filters.length > 1">
+                    <div v-show="filterList.length > 1">
                         符合一下
                         <a-select v-model="filterRelation" size="small">
                             <a-option value="所有">所有</a-option>
@@ -20,7 +20,7 @@
                     </div>
                 </div>
                 <div class="filter-pop-body">
-                    <div class="filter-row" v-for="(filter, index) in filters" :key="index">
+                    <div class="filter-row" v-for="(filter, index) in filterList" :key="index">
                         <a-row :gutter="12">
                             <a-col :span="6">
                                 <a-select v-model="filter.colName" placeholder="请选择字段" style="width: 100%">
@@ -74,8 +74,8 @@
                         添加条件
                     </a-button>
                     <a-space>
-                        <a-button type="primary">查询</a-button>
-                        <a-button>重置</a-button>
+                        <a-button type="primary" @click="handleQuery">查询</a-button>
+                        <a-button @click="handleReset">重置</a-button>
                     </a-space>
                 </div>
             </section>
@@ -85,7 +85,7 @@
 
 <script setup lang="ts">
 import { IconFilter, IconPlus, IconClose } from "@arco-design/web-vue/es/icon";
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 
 type Props = {
     filters: any[];
@@ -93,7 +93,8 @@ type Props = {
     filterColNames: any[];
 };
 const props = withDefaults(defineProps<Props>(), {});
-const filterNum = computed(() => props.filters.length);
+const filterList = ref<any[]>([]);
+const filterNum = computed(() => filterList.value.length);
 const filterRelation = ref("所有");
 // 针对不同类型，关系列表不同
 const relations: Record<string, any[]> = {
@@ -102,6 +103,10 @@ const relations: Record<string, any[]> = {
     时间: ["等于", "晚于", "早于", "为空", "不为空"],
     业务标签: ["等于", "不等于", "包含", "不包含", "为空", "不为空"],
 };
+
+watch(props.filters, () => {
+    filterList.value = props.filters;
+});
 
 function getColTypeByName(colName: string) {
     const { type } = props.columns.find((col) => col.title === colName) || {};
@@ -126,10 +131,17 @@ function handleAddFilter() {
         relation: "等于",
         value: "",
     };
-    props.filters.push(newFilter);
+    filterList.value.push(newFilter);
 }
 function handleRemoveFilter(index: number) {
-    props.filters.splice(index, 1);
+    filterList.value.splice(index, 1);
+}
+
+function handleQuery() {
+    console.log(filterList.value);
+}
+function handleReset() {
+    filterList.value = [];
 }
 </script>
 
