@@ -7,12 +7,12 @@ export const LogicUtils = {
     },
     assert(source: any, target: any, relation: string) {
         let pass = false;
+        if (typeof source !== 'string') {
+            source = JSON.stringify(source);
+        }
         if (typeof target !== 'string') {
             target = JSON.stringify(target);
         }
-        console.log('\n\ntarget:\n', target);
-        console.log('\n\nsource:\n', source);
-        console.log('\n\nrelation:\n', relation);
         switch (relation) {
             case 'eq': // 等于
                 pass = source === target;
