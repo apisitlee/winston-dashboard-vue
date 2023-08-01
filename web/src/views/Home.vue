@@ -115,11 +115,11 @@
           <span :class="record.level">{{ record.level }}</span>
         </template>
         <template #message="{ record }">
-          {{ JSON.stringify(record) }}
+          {{ JSON.stringify(record.message) }}
         </template>
         <template #tags="{ record, rowIndex }">
           <a-space wrap>
-            <a-tag v-for="(tag, ind) in Object.entries(record || {})" :key="`${rowIndex}-${ind}`">
+            <a-tag v-for="(tag, ind) in Object.entries(record.tags || {})" :key="`${rowIndex}-${ind}`">
               {{ tagsMap[tag[0]] }}: {{ tag[1] }}
             </a-tag>
           </a-space>
@@ -135,6 +135,7 @@
       <a-pagination v-model:current="pagination.pageNo" v-model:page-size="pagination.pageSize" :total="pagination.total"
         :page-size-options="[10, 20, 50, 100]" show-total show-jumper show-page-size @change="loadData" />
     </div>
+    {{ filterColNames }}
   </div>
   <DetailModal ref="detailModalRef" />
   <a-back-top />
