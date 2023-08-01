@@ -1,4 +1,4 @@
-import { LogicUtils } from './utils/LogicUtils';
+import { LogicUtils } from './utils/LogicUtils.js';
 import Koa from 'koa';
 import Router from 'koa-router';
 import bodyParser from 'koa-bodyparser';
@@ -224,11 +224,11 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
             }
             function getObjectValue(obj: object, key: string) {
                 const keys = key.split('.') || [];
-                let tmp = obj;
+                let tmp: any = obj;
                 let max = keys.length;
                 let i = 0;
                 for (let k of keys) {
-                    let old = tmp;
+                    let old: any = tmp;
                     tmp = old[k];
                     if (++i < max && typeof tmp !== 'object') {
                         tmp = old;
