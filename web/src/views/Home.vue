@@ -9,9 +9,16 @@
         </a-radio-group>
       </div>
       <div>
-        <FilterPanel :filters="filters" :columns="columns" :filter-col-names="filterColNames" />
+        <a-space>
+          <FilterPanel :filters="filters" :columns="columns" :filter-col-names="filterColNames" />
+          <a-button type="text" :loading="loading" @click="() => handleRefresh()">
+            <template #icon>
+              <icon-refresh />
+            </template>
+          </a-button>
+        </a-space>
       </div>
-      <div class="query-form">
+      <div class="query-form" v-show="false">
         <a-form :model="form" layout="inline" size="small" @submit="loadData">
           <a-form-item field="s">
             <a-input v-model="form.s" placeholder="模糊搜索日志内容" allow-clear />
