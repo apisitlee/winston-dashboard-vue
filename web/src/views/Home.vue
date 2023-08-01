@@ -135,7 +135,6 @@
       <a-pagination v-model:current="pagination.pageNo" v-model:page-size="pagination.pageSize" :total="pagination.total"
         :page-size-options="[10, 20, 50, 100]" show-total show-jumper show-page-size @change="loadData" />
     </div>
-    {{ filterColNames }}
   </div>
   <DetailModal ref="detailModalRef" />
   <a-back-top />
@@ -157,8 +156,8 @@ import {
 const logConfigs = ref<any>([]);
 const tableData = ref<any>([]);
 const columnsBefore = ref([
-  { title: "#", slotName: "_index", width: 80, fixed: "left" },
-  { title: "日志等级", slotName: "level", width: 100 },
+  { title: "#", dataIndex: "_index", slotName: "_index", width: 80, fixed: "left" },
+  { title: "日志等级", dataIndex: "level", slotName: "level", width: 100 },
   {
     title: "日志内容",
     dataIndex: "message",
@@ -170,7 +169,7 @@ const columnsBefore = ref([
 ]);
 const columnsAfter = ref([
   { title: "记录时间", dataIndex: "timestamp", width: 180 },
-  { title: "操作", slotName: "action", width: 100, fixed: "right" },
+  { title: "操作", dataIndex: "action", slotName: "action", width: 100, fixed: "right" },
 ]);
 const customColumns = ref([]);
 const columns: ComputedRef<any[]> = computed(() => {
@@ -202,11 +201,11 @@ const filters = ref<any[]>([]);
 const filterRelation = ref("所有");
 const filterColNames = computed(() => {
   const list = columns.value.filter((item: any) => {
-    if (item.dataIndex !== "_index") return false;
-    if (item.dataIndex !== "level") return false;
-    if (item.dataIndex !== "timestamp") return false;
-    if (item.dataIndex !== "action") return false;
-    return true;
+    if (item.dataIndex !== "_index") return true;
+    if (item.dataIndex !== "level") return true;
+    if (item.dataIndex !== "timestamp") return true;
+    if (item.dataIndex !== "action") return true;
+    return false;
   });
   return list;
 });
