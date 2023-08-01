@@ -247,7 +247,7 @@ async function loadData() {
       requestUrl.searchParams.append(key, params[key])
     );
     const res = await fetch(requestUrl, {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },

@@ -1,3 +1,4 @@
+import { LogicUtils } from './utils/LogicUtils';
 import Koa from 'koa';
 import Router from 'koa-router';
 import bodyParser from 'koa-bodyparser';
@@ -211,15 +212,37 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
     });
 
     // 查询日志
-    router.get('/api/query', async (ctx: any) => {
+    router.post('/api/query', async (ctx: any) => {
         try {
-            const { query } = ctx.request;
-            let { level, s, pageNo = 1, pageSize = 10, range = '', refresh = false } = query || {};
+            const { body } = ctx.request;
+            let { level, s, pageNo = 1, pageSize = 10, range = '', refresh = false, filters = [], filterRelation = '所有' } = body || {};
             pageNo = parseInt(pageNo);
             pageSize = parseInt(pageSize);
             let [startTime, endTime] = range.split(',');
             if (refresh) {
                 flush();
+            }
+            function getObjectValue(obj: object, key: string) {
+                const keys = key.split('.') || [];
+                let tmp = obj;
+                let max = keys.length;
+                let i = 0;
+                for (let k of keys) {
+                    let old = tmp;
+                    tmp = old[k];
+                    if (++i < max && typeof tmp !== 'object') {
+                        tmp = old;
+                        continue;
+                    }
+                }
+                return tmp;
+            }
+            function getSourceValue(item: any, dataIndex: string, isCustom: boolean) {
+                if (isCustom) {
+                    return getObjectValue(item.message, dataIndex);
+                } else {
+                    return getObjectValue(item, dataIndex);
+                }
             }
             const result = list.filter(item => {
                 if (level && item.level !== level) return false;
@@ -230,6 +253,13 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
                 if (startTime && endTime) {
                     const time = new Date(item.timestamp);
                     if (time < new Date(startTime) || time > new Date(endTime)) return false;
+                }
+                if (filters && filters.length) {
+                    // dataIndex, relation, value, isCustom
+                    const relate = filterRelation === '所有' ? LogicUtils.and : LogicUtils.or;
+                    return relate(...filters.map((filter: any) => {
+                        return LogicUtils.assert(getSourceValue(item, filter.dataIndex, filter.isCustom), filter.value, filter.relate)
+                    }));
                 }
                 return true;
             });
