@@ -115,11 +115,11 @@
           <span :class="record.level">{{ record.level }}</span>
         </template>
         <template #message="{ record }">
-          {{ JSON.stringify(record.message) }}
+          {{ JSON.stringify(record) }}
         </template>
         <template #tags="{ record, rowIndex }">
           <a-space wrap>
-            <a-tag v-for="(tag, ind) in Object.entries(record.tags || {})" :key="`${rowIndex}-${ind}`">
+            <a-tag v-for="(tag, ind) in Object.entries(record || {})" :key="`${rowIndex}-${ind}`">
               {{ tagsMap[tag[0]] }}: {{ tag[1] }}
             </a-tag>
           </a-space>
@@ -158,8 +158,14 @@ const tableData = ref<any>([]);
 const columnsBefore = ref([
   { title: "#", slotName: "_index", width: 80, fixed: "left" },
   { title: "日志等级", slotName: "level", width: 100 },
-  { title: "日志内容", slotName: "message", cellClass: "max-3-lines", width: 300 },
-  { title: "业务标签", slotName: "tags", width: 200 },
+  {
+    title: "日志内容",
+    dataIndex: "message",
+    slotName: "message",
+    cellClass: "max-3-lines",
+    width: 300,
+  },
+  { title: "业务标签", dataIndex: "tags", slotName: "tags", width: 200 },
 ]);
 const columnsAfter = ref([
   { title: "记录时间", dataIndex: "timestamp", width: 180 },
