@@ -25,7 +25,7 @@
                             <a-col :span="6">
                                 <a-select v-model="filter.colName" placeholder="请选择字段" style="width: 100%">
                                     <a-option v-for="(col, i) in filterColNames" :key="`${index}-${i}`"
-                                        :value="col.dataIndex">
+                                        :value="col.colName">
                                         {{ col.title }}
                                     </a-option>
                                 </a-select>
