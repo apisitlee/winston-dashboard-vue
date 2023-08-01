@@ -67,7 +67,7 @@
                     </div>
                 </div>
                 <div class="filter-pop-footer">
-                    <a-button type="text" @click="handleAddFilter">
+                    <a-button type="text" style="padding: 0" @click="handleAddFilter">
                         <template #icon>
                             <icon-plus />
                         </template>
