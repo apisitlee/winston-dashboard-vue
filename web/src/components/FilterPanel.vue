@@ -12,7 +12,7 @@
                     <div>设置筛选条件</div>
                     <div v-show="filters.length > 1">
                         符合一下
-                        <a-select v-model="filterRelation">
+                        <a-select v-model="filterRelation" size="small">
                             <a-option value="所有">所有</a-option>
                             <a-option value="任一">任一</a-option>
                         </a-select>
@@ -51,7 +51,7 @@
                             </a-col>
                             <a-col :span="12" v-if="getColTypeByName(filter.colName) === '时间'">
                                 <a-date-picker v-model="filter.value" placeholder="请选择" format="YYYY-MM-DD HH:mm:ss"
-                                    show-time allow-clear style="width: 100%" />
+                                    show-time allow-clear style="width: 190px" />
                             </a-col>
                             <a-col :span="12" v-if="getColTypeByName(filter.colName) === '业务标签'">
                                 <a-input v-model="filter.value" placeholder="请输入" allow-clear style="width: 100%" />
@@ -188,6 +188,14 @@ function handleRemoveFilter(index: number) {
     border-color: #dddddd;
     padding-left: 6px;
     padding-right: 6px;
+    border-radius: 6px;
+}
+
+.filter-row .arco-picker {
+    background-color: transparent;
+    border-color: #dddddd;
+    padding-left: 0;
+    padding-right: 10px;
     border-radius: 6px;
 }
 </style>
