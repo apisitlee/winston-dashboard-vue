@@ -77,7 +77,7 @@
           <span :class="record.level">{{ record.level }}</span>
         </template>
         <template #message="{ record }">
-          {{ JSON.stringify(record.message) }}
+          <div class="max-3-lines">{{ JSON.stringify(record.message) }}</div>
         </template>
         <template #tags="{ record, rowIndex }">
           <a-space wrap>
@@ -323,5 +323,14 @@ function onClickItem(record: any, index: number) {
 <style>
 .log-table .arco-form-item-layout-inline {
   margin-right: 0;
+}
+.log-table .max-3-lines {
+  width: 100%;
+  max-height: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 </style>

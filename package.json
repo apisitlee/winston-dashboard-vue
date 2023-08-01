@@ -17,7 +17,6 @@
     "index.cjs"
   ],
   "scripts": {
-    "test": "node test.js",
     "build:web": "cd web && yarn run build",
     "build:server": "cd server && yarn run build",
     "build": "yarn run build:server && yarn run build:web && rm -rf ./output && mkdir output && mv server/lib output/server && mv web/dist output/web",
@@ -30,7 +29,8 @@
   },
   "workspaces": [
     "server",
-    "web"
+    "web",
+    "example.local"
   ],
   "peerDependencies": {
     "@koa/cors": "^4.0.0",
