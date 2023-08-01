@@ -54,17 +54,7 @@ export async function fileFinder(readStorage: (filename: string) => string, onUp
         if (active === '') return list;
         // 读取../storage.local/logs文件，获取所有日志源，筛选出当前日志源
         const configs = readStorage('logs.txt');
-        const config = configs.split('\n').map((item) => {
-            const [timestamp, name, logPath, logFilename] = item.split('\t');
-            return {
-                timestamp,
-                name,
-                logPath,
-                logFilename,
-            };
-        }).filter((item) => {
-            return item.timestamp === active;
-        }).pop() || {};
+        const config = configs.split('\n').map((item) => JSON.parse(item)).filter((item) => item.id === active).pop() || {};
         try {
             const file = (await streamReadFiles(config)) || '';
             file.split('\n').map((item, index) => {
@@ -79,7 +69,7 @@ export async function fileFinder(readStorage: (filename: string) => string, onUp
                 }
             });
             return list;
-        } catch(e) {
+        } catch (e) {
             console.log('stream read file error', e);
             return list;
         }
