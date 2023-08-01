@@ -23,7 +23,8 @@
                     <div class="filter-row" v-for="(filter, index) in filterList" :key="index">
                         <a-row :gutter="12">
                             <a-col :span="6">
-                                <a-select v-model="filter.colName" placeholder="请选择字段" style="width: 100%">
+                                <a-select v-model="filter.colName" placeholder="请选择字段" style="width: 100%"
+                                    @change="() => (filter.value = '')">
                                     <a-option v-for="(col, i) in filterColNames" :key="`${index}-${i}`"
                                         :value="col.colName">
                                         {{ col.title }}
@@ -90,6 +91,7 @@ import { ref, computed, watch } from "vue";
 type Props = {
     filters: any[];
     columns: any[];
+    tags: any[];
     filterColNames: any[];
 };
 const props = withDefaults(defineProps<Props>(), {});
@@ -127,7 +129,7 @@ function getColEnumsByName(colName: string) {
 
 function handleAddFilter() {
     const newFilter = {
-        colName: "",
+        colName: "日志内容",
         relation: "等于",
         value: "",
     };
@@ -138,7 +140,43 @@ function handleRemoveFilter(index: number) {
 }
 
 function handleQuery() {
-    console.log(filterList.value);
+    console.log("filterList: ", filterList.value);
+    let list: any[] = [];
+    Array.from(filterList.value).map((row: any) => {
+        const column = props.columns.find((col) => col.title === row.colName);
+        if (column) {
+            if (column.type === "文本") {
+                list.push({
+                    dataIndex: column.dataIndex,
+                    relation: row.relation,
+                    value: row.value,
+                    isCustom: column.isCustom,
+                });
+            } else if (column.type === "枚举") {
+                list.push({
+                    dataIndex: column.dataIndex,
+                    relation: row.relation,
+                    value: row.value,
+                    isCustom: column.isCustom,
+                });
+            } else if (column.type === "时间") {
+                list.push({
+                    dataIndex: column.dataIndex,
+                    relation: row.relation,
+                    value: row.value,
+                    isCustom: column.isCustom,
+                });
+            } else if (column.type === "业务标签") {
+                list.push({
+                    dataIndex: column.dataIndex,
+                    relation: row.relation,
+                    value: row.value,
+                    isCustom: column.isCustom,
+                });
+            }
+        }
+    });
+    console.log("处理后: ", list);
 }
 function handleReset() {
     filterList.value = [];

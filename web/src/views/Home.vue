@@ -8,9 +8,9 @@
           </a-radio>
         </a-radio-group>
       </div>
-      <div>
+      <div style="margin: 12px 0">
         <a-space>
-          <FilterPanel :filters="filters" :columns="columns" :filter-col-names="filterColNames" />
+          <FilterPanel :filters="filters" :columns="columns" :tags="tagsDef" :filter-col-names="filterColNames" />
           <a-button type="text" :loading="loading" @click="() => handleRefresh()">
             <template #icon>
               <icon-refresh />
@@ -75,7 +75,7 @@
           </a-space>
         </template>
         <template #action="{ record, rowIndex }">
-          <a-button type="text" @click="() => onClickItem(record, rowIndex)">
+          <a-button type="text" style="margin-left: -16px" @click="() => onClickItem(record, rowIndex)">
             详情
           </a-button>
         </template>
@@ -101,12 +101,12 @@ import FilterPanel from "../components/FilterPanel.vue";
 const logConfigs = ref<any>([]);
 const tableData = ref<any>([]);
 const columnsBefore = ref([
-  { title: "#", dataIndex: "_index", slotName: "_index", width: 80, fixed: "left" },
+  { title: "#", dataIndex: "_index", slotName: "_index", width: 60, fixed: "left" },
   {
     title: "日志等级",
     dataIndex: "level",
     slotName: "level",
-    width: 100,
+    width: 80,
     type: "枚举",
     enum: "info,error",
   },
@@ -323,6 +323,7 @@ function setCustomColumnsByConfig() {
   if (config) {
     customColumns.value = (config.customColumns || []).map((col: any) => {
       col.dataIndex = `message.${col.dataIndex}`;
+      col.isCustom = true;
       return col;
     });
   }
