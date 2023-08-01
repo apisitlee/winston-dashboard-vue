@@ -12,7 +12,7 @@
                     <div>设置筛选条件</div>
                     <div v-show="filters.length > 1">
                         符合一下
-                        <a-select v-model="filterRelation" style="width: 6em">
+                        <a-select v-model="filterRelation">
                             <a-option value="所有">所有</a-option>
                             <a-option value="任一">任一</a-option>
                         </a-select>
@@ -149,11 +149,25 @@ function handleRemoveFilter(index: number) {
 </style>
 
 <style>
+.filter-pop-header .arco-select-view-single {
+    width: auto;
+    padding-left: 6px;
+    padding-right: 6px;
+    background: transparent;
+    border-color: #dddddd;
+    border-radius: 6px;
+}
+
+.filter-pop-header .arco-select-view-single .arco-select-view-suffix {
+    padding-left: 4px;
+}
+
 .filter-row .arco-select-view-single,
 .filter-row .arco-input-wrapper {
     background-color: transparent;
     border-color: #dddddd;
     padding-left: 6px;
     padding-right: 6px;
+    border-radius: 6px;
 }
 </style>
