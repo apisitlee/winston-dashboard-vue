@@ -35,11 +35,11 @@ export const LogicUtils = {
                 }
                 break;
             case 'n': // 为空
-                pass = target === '' || target === null || target === undefined;
+                pass = source === '' || source === null || source === undefined;
                 break;
             case 'nn': // 不为空
-                console.log('\n\n不为空吗？\n', target, typeof target);
-                pass = target !== '' && target !== null && target !== undefined;
+                console.log('\n\n不为空吗？\n', source, typeof source);
+                pass = source !== '' && source !== null && source !== undefined;
                 break;
             case 'lt': // 晚于
                 try {
