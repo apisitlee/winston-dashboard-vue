@@ -18,10 +18,32 @@
           </a-button>
           <template #content>
             <section style="width: 500px; max-height: 350px; overflow: auto">
-              <div>设置筛选条件</div>
-              <div></div>
               <div>
-                <a-button>
+                <div>设置筛选条件</div>
+                <div v-show="filters.length > 1">
+                  符合一下
+                  <a-select v-model="filterRelation" style="width: 3em">
+                    <a-option value="所有">所有</a-option>
+                    <a-option value="任一">任一</a-option>
+                  </a-select>
+                  条件
+                </div>
+              </div>
+              <div v-for="(filter, i) in filters" :key="i">
+                <a-select v-model="filter.colName"></a-select>
+                <a-select v-model="filter.relation">
+                  <a-option value="等于">等于</a-option>
+                  <a-option value="不等于">不等于</a-option>
+                  <a-option value="包含">包含</a-option>
+                  <a-option value="不包含">不包含</a-option>
+                  <a-option value="为空">为空</a-option>
+                  <a-option value="不为空">不为空</a-option>
+                </a-select>
+                <a-input v-model="filter.value" placeholder="请输入" />
+                <IconClose @click="() => handleRemoveFilter(i)" />
+              </div>
+              <div>
+                <a-button @click="handleAddFilter">
                   <template #icon>
                     <icon-plus />
                   </template>
@@ -157,6 +179,8 @@ const pagination = ref({
   pageSize: 10,
   total: 0,
 });
+const filters = ref<any[]>([]);
+const filterRelation = ref("所有");
 const form = ref({
   level: "",
   s: "",
@@ -176,6 +200,17 @@ onMounted(async () => {
   setCustomColumnsByConfig();
 });
 
+function handleAddFilter() {
+  const newFilter = {
+    colName: "",
+    relation: "等于",
+    value: "",
+  };
+  filters.value.push(newFilter);
+}
+function handleRemoveFilter(index: number) {
+  filters.value.splice(index, 1);
+}
 function handleRefresh() {
   form.value.refresh = true;
   loadData();
