@@ -9,16 +9,34 @@
         </a-radio-group>
       </div>
       <div>
-        <a-popover trigger="click" title="设置筛选条件" position="bl">
-          <a-button type="text" :icon="IconFilter">筛选</a-button>
+        <a-popover trigger="click" position="bl">
+          <a-button type="text">
+            <template #icon>
+              <icon-filter />
+            </template>
+            筛选
+          </a-button>
           <template #content>
-            <div></div>
-            <div>
-              <a-button :icon="IconPlus">添加条件</a-button>
-            </div>
-            <div>
-              <a-button size="small" type="text" :icon="IconSave">另存为视图</a-button>
-            </div>
+            <section style="width: 500px; max-height: 350px; overflow: auto">
+              <div>设置筛选条件</div>
+              <div></div>
+              <div>
+                <a-button>
+                  <template #icon>
+                    <icon-plus />
+                  </template>
+                  添加条件
+                </a-button>
+              </div>
+              <div>
+                <a-button size="small" type="text">
+                  <template #icon>
+                    <icon-save />
+                  </template>
+                  另存为新视图
+                </a-button>
+              </div>
+            </section>
           </template>
         </a-popover>
       </div>
@@ -53,7 +71,11 @@
                 查询
               </a-button>
               <a-button html-type="reset" @click="() => handleReset()"> 重置 </a-button>
-              <a-button type="text" @click="() => handleRefresh()">刷新缓存</a-button>
+              <a-button type="text" @click="() => handleRefresh()">
+                <template #icon>
+                  <IconRefresh />
+                </template>
+              </a-button>
             </a-space>
           </a-form-item>
         </a-form>
