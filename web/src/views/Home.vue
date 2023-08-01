@@ -97,7 +97,20 @@ const columnsAfter = ref([
 ]);
 const customColumns = ref([]);
 const columns: ComputedRef<any[]> = computed(() => {
-  return [...columnsBefore.value, ...customColumns.value, ...columnsAfter.value];
+  const list = [...columnsBefore.value, ...customColumns.value, ...columnsAfter.value];
+  let left: any[] = [];
+  let normal: any[] = [];
+  let right: any[] = [];
+  list.map((col: any) => {
+    if (col.fixed === "left") {
+      left.push(col);
+    } else if (col.fixed === "right") {
+      right.push(col);
+    } else {
+      normal.push(col);
+    }
+  });
+  return [...left, ...normal, ...right];
 });
 const loading = ref(false);
 const pagination = ref({
