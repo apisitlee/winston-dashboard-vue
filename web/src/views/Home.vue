@@ -10,7 +10,8 @@
       </div>
       <div style="margin: 12px 0">
         <a-space>
-          <FilterPanel :filters="filters" :columns="columns" :tags="tagsDef" :filter-col-names="filterColNames" />
+          <FilterPanel :filters="filters" :filter-relation="filterRelation" :columns="columns" :tags="tagsDef"
+            :filter-col-names="filterColNames" @query="handleQuery" @reset="handleReset" />
           <a-button type="text" :loading="loading" @click="() => handleRefresh()">
             <template #icon>
               <icon-refresh />
@@ -157,6 +158,7 @@ const pagination = ref({
   total: 0,
 });
 const filters = ref<any[]>([]);
+const filterRelation = ref<string>("所有");
 const filterColNames = computed(() => {
   const list = columns.value.filter((item: any) => {
     return !["#", "操作"].includes(item.title);
@@ -191,6 +193,10 @@ async function handleRefresh() {
   }
   form.value.refresh = false;
 }
+async function handleQuery(filterList: any[]) {
+  filters.value = filterList;
+  await loadData();
+}
 function handleReset() {
   form.value = {
     s: "",
@@ -199,6 +205,7 @@ function handleReset() {
     tag: [],
     refresh: false,
   };
+  filters.value = [];
   loadData();
 }
 
@@ -229,6 +236,8 @@ async function loadData() {
       range: form.value.range,
       pageSize: pagination.value.pageSize,
       pageNo: pagination.value.pageNo,
+      filters: filters.value,
+      filterRelation: filterRelation.value,
     };
     const requestUrl = new URL(
       `${import.meta.env.VITE_BASE_URL}api/query`,
