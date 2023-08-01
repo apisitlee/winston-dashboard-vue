@@ -215,10 +215,10 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
     router.post('/api/query', async (ctx: any) => {
         try {
             const { body } = ctx.request;
-            let { level, s, pageNo = 1, pageSize = 10, range = '', refresh = false, filters = [], filterRelation = '所有' } = body || {};
+            let { level, s, pageNo = 1, pageSize = 10, range = [], refresh = false, filters = [], filterRelation = '所有' } = body || {};
             pageNo = parseInt(pageNo);
             pageSize = parseInt(pageSize);
-            let [startTime, endTime] = range.split(',');
+            let [startTime, endTime] = range;
             if (refresh) {
                 flush();
             }
