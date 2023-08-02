@@ -3,18 +3,18 @@ import logo from "./assets/logo.svg";
 import { useRoute } from "vue-router";
 import { useLogConfig } from "./composables/useLogConfig";
 import { computed } from "vue";
-import { IconHome, IconSettings, IconFile } from "@arco-design/web-vue/es/icon";
+import { IconSettings, IconFile } from "@arco-design/web-vue/es/icon";
 
 const route = useRoute();
 const isActive = (path: string) => route.path === path;
 
 const menu = computed(() => {
   return [
-    {
-      title: "首页",
-      path: "/",
-      icon: IconHome,
-    },
+    // {
+    //   title: "首页",
+    //   path: "/",
+    //   icon: IconHome,
+    // },
     {
       title: "配置",
       path: "/config",
@@ -22,7 +22,7 @@ const menu = computed(() => {
     },
     ...logConfigs.value.map(({ id, name }: any) => {
       return {
-        title: name,
+        title: `日志 • ${name}`,
         path: `/log/${id}`,
         icon: IconFile,
       };

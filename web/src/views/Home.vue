@@ -151,7 +151,6 @@ watch(id, () => {
 });
 
 onMounted(async () => {
-  // await getActive();
   await loadData();
   setTagsByConfig();
   setCustomColumnsByConfig();
@@ -185,27 +184,10 @@ function handleReset() {
   loadData();
 }
 
-// async function loadLogConfigs() {
-//   try {
-//     const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/logConfig/list`, {
-//       method: "GET",
-//     });
-//     const data = await res.json();
-//     logConfigs.value = data.data || [];
-//   } catch (error) {
-//     console.error(error);
-//     Modal.error({
-//       title: "Error",
-//       content: typeof error === "string" ? error : JSON.stringify(error),
-//     });
-//   }
-// }
-
 async function loadData() {
   if (loading.value) return;
   loading.value = true;
   try {
-    // await loadLogConfigs();
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/query`, {
       method: "POST",
       headers: {
@@ -249,12 +231,6 @@ async function loadData() {
   }
   loading.value = false;
 }
-
-// async function getActive() {
-//   const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/logConfig/active`);
-//   const { data } = await res.json();
-//   active.value = data;
-// }
 
 async function onChangeSource(ev: any) {
   try {

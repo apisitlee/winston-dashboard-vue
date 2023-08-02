@@ -123,6 +123,7 @@
 import { onMounted, ref } from "vue";
 import { Modal, Message } from "@arco-design/web-vue";
 import { IconPlus, IconMinusCircle } from "@arco-design/web-vue/es/icon";
+import { useLogConfig } from "../composables/useLogConfig";
 
 type Tag = {
   label: string;
@@ -149,7 +150,6 @@ type FormData = {
   customColumns: CustomColumn[];
 };
 
-const logConfigs = ref<any>([]);
 const formRef = ref();
 const form = ref<FormData>({
   id: "",
@@ -158,7 +158,17 @@ const form = ref<FormData>({
   logPath: "",
   logFilename: "",
   tags: [{ label: "", slug: "" }],
-  customColumns: [{ title: "", dataIndex: "", type: '文本', enum: '', width: 200, fixed: "", ellipsis: true }],
+  customColumns: [
+    {
+      title: "",
+      dataIndex: "",
+      type: "文本",
+      enum: "",
+      width: 200,
+      fixed: "",
+      ellipsis: true,
+    },
+  ],
 });
 const rules = ref({
   name: [
@@ -269,20 +279,11 @@ const customColumnsColumns = ref([
 ]);
 const visible = ref(false);
 const title = ref("");
+const { logConfigs, loadLogConfigs } = useLogConfig();
 
 onMounted(() => {
   loadLogConfigs();
 });
-
-async function loadLogConfigs() {
-  try {
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/logConfig/list`);
-    const { data = [] } = await res.json();
-    logConfigs.value = data;
-  } catch (e) {
-    console.error(e);
-  }
-}
 
 function onClickAdd() {
   visible.value = true;
@@ -385,8 +386,8 @@ function onClickAddCustomColumn() {
   form.value.customColumns.push({
     title: "",
     dataIndex: "",
-    type: '文本',
-    enum: '',
+    type: "文本",
+    enum: "",
     width: 200,
     fixed: "",
     ellipsis: true,
