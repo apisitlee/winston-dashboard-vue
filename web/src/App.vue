@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import logo from "./assets/vue.svg";
+import logo from "./assets/logo.svg";
 import { useRoute } from "vue-router";
 const route = useRoute();
 const isActive = (path: string) => route.path === path;
