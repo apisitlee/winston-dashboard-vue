@@ -8,5 +8,10 @@ export default [
         path: '/config',
         name: 'Config',
         component: () => import('../views/Config.vue'),
+    },
+    {
+        path: '/log/:logConfigId',
+        name: 'Log',
+        component: () => import('../views/Home.vue'),
     }
 ];

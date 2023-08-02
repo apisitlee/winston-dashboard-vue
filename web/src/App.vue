@@ -1,19 +1,35 @@
 <script setup lang="ts">
 import logo from "./assets/logo.svg";
 import { useRoute } from "vue-router";
+import { useLogConfig } from "./composables/useLogConfig";
+import { computed } from "vue";
+import { IconHome, IconSettings, IconFile } from "@arco-design/web-vue/es/icon";
+
 const route = useRoute();
 const isActive = (path: string) => route.path === path;
 
-const menu = [
-  {
-    title: "首页",
-    path: "/",
-  },
-  {
-    title: "配置",
-    path: "/config",
-  },
-];
+const menu = computed(() => {
+  return [
+    {
+      title: "首页",
+      path: "/",
+      icon: IconHome,
+    },
+    {
+      title: "配置",
+      path: "/config",
+      icon: IconSettings,
+    },
+    ...logConfigs.value.map(({ id, name }: any) => {
+      return {
+        title: name,
+        path: `/log/${id}`,
+        icon: IconFile,
+      };
+    }),
+  ];
+});
+const { logConfigs } = useLogConfig();
 </script>
 
 <template>
@@ -24,7 +40,8 @@ const menu = [
         <span>Log Dashboard</span>
       </h3>
       <router-link :class="{ 'menu-item': true, active: isActive(item.path) }" v-for="item in menu" :to="item.path">
-        {{ item.title }}
+        <component :is="item.icon" />
+        <span>{{ item.title }}</span>
       </router-link>
     </aside>
     <main class="page-main">
@@ -59,7 +76,7 @@ const menu = [
 .page-title {
   line-height: 1;
   margin: 0;
-  padding: 18px 12px;
+  padding: 6px 12px 14px 12px;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -90,5 +107,9 @@ const menu = [
 .menu-item.active {
   background-color: #90b1ff33;
   color: #165dff;
+}
+
+.menu-item span {
+  margin-left: 0.5em;
 }
 </style>

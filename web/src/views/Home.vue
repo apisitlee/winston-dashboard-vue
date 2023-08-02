@@ -1,14 +1,14 @@
 <template>
   <div>
     <a-spin :loading="loading" style="width: 100%">
-      <div>
+      <!-- <div>
         <a-radio-group v-model="active" type="button" @change="onChangeSource">
           <a-radio :value="config.id" v-for="config in logConfigs">
             {{ config.name }}
           </a-radio>
         </a-radio-group>
-      </div>
-      <div style="margin: 12px 0">
+      </div> -->
+      <div style="margin: 0 0 12px 0">
         <a-space>
           <FilterPanel :filters="filters" :relation="filterRelation" :columns="columns" :tags="tagsDef"
             :filter-col-names="filterColNames" @relation-change="handleRelationChange" @query="handleQuery"
