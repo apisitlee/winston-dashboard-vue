@@ -10,11 +10,6 @@ const isActive = (path: string) => route.path === path;
 
 const menu = computed(() => {
   return [
-    // {
-    //   title: "首页",
-    //   path: "/",
-    //   icon: IconHome,
-    // },
     {
       title: "配置",
       path: "/config",

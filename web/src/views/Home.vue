@@ -144,9 +144,11 @@ const detailModalRef = ref();
 const route = useRoute();
 const id = computed(() => route.params.logConfigId);
 
-watch(id, () => {
+watch(id, async () => {
   if (id.value) {
-    onChangeSource(id.value);
+    form.value.refresh = true;
+    await onChangeSource(id.value);
+    form.value.refresh = false;
   }
 });
 
