@@ -73,7 +73,7 @@ const columnsBefore = ref([
     title: "日志等级",
     dataIndex: "level",
     slotName: "level",
-    width: 80,
+    width: 100,
     type: "枚举",
     enum: "info,error",
   },
