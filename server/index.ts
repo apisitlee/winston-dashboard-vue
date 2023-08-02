@@ -244,7 +244,7 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
                     return getObjectValue(item, dataIndex);
                 }
             }
-            const result = list.filter(item => {
+            let result = list.filter(item => {
                 if (level && item.level !== level) return false;
                 if (s) {
                     if (typeof item.message === 'string' && !(item.message).includes(s)) return false;
@@ -263,6 +263,7 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
                 }
                 return true;
             });
+            result = result.sort((a: any, b: any) => (new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()))
             const total = result.length;
             const start = (pageNo - 1) * pageSize;
             const end = pageNo * pageSize;

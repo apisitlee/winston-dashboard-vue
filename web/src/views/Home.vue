@@ -20,8 +20,8 @@
           </a-button>
         </a-space>
       </div>
-      <a-table :data="tableData" :columns="columns" :pagination="false" :sticky-header="true" :loading="loading"
-        :scroll="{ x: '100%' }" scrollbar bordered stripe column-resizable>
+      <a-table :data="tableData" :columns="columns" :pagination="false" :loading="loading"
+        :scroll="{ x: '100%', y: 'calc(100vh - 100px)' }" scrollbar bordered stripe column-resizable>
         <template #_index="{ rowIndex }">{{ rowIndex + 1 }}</template>
         <template #level="{ record }">
           <span :class="record.level">{{ record.level }}</span>
@@ -45,7 +45,8 @@
     </a-spin>
     <div class="log-table-foot" v-show="pagination.total !== 0">
       <a-pagination v-model:current="pagination.pageNo" v-model:page-size="pagination.pageSize" :total="pagination.total"
-        :page-size-options="[10, 20, 50, 100]" show-total show-jumper show-page-size @change="loadData" />
+        :page-size-options="[10, 20, 50, 100]" show-total show-jumper show-page-size @change="loadData"
+        @page-size-change="loadData" />
     </div>
   </div>
   <DetailModal ref="detailModalRef" />

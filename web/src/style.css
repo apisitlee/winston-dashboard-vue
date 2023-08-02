@@ -11,3 +11,7 @@ body {
   padding: 24px;
   overscroll-behavior: none;
 }
+
+.arco-select-dropdown-list-wrapper {
+  max-height: 220px;
+}
