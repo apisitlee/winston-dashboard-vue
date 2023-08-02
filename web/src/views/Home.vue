@@ -20,8 +20,8 @@
           </a-button>
         </a-space>
       </div>
-      <a-table :data="tableData" :columns="columns" :pagination="false" :loading="loading"
-        :scroll="{ x: '100%', y: 'calc(100vh - 100px)' }" scrollbar bordered stripe column-resizable>
+      <a-table :data="tableData" :columns="columns" :pagination="false" :loading="loading" :scroll="{ x: '100%' }"
+        scrollbar bordered stripe column-resizable>
         <template #_index="{ rowIndex }">{{ rowIndex + 1 }}</template>
         <template #level="{ record }">
           <span :class="record.level">{{ record.level }}</span>

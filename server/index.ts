@@ -263,7 +263,7 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
                 }
                 return true;
             });
-            result = result.sort((a: any, b: any) => (new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()))
+            result = result.sort((a: any, b: any) => (new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()))
             const total = result.length;
             const start = (pageNo - 1) * pageSize;
             const end = pageNo * pageSize;
