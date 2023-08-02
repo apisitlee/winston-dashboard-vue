@@ -137,7 +137,6 @@ const form = ref({
   tag: [],
   refresh: false,
 });
-const active = ref("");
 const tagsDef = ref<any>([]);
 const tagsMap = ref<any>({});
 const detailModalRef = ref();
@@ -147,7 +146,7 @@ const id = computed(() => route.params.logConfigId);
 watch(id, async () => {
   if (id.value) {
     form.value.refresh = true;
-    await onChangeSource(id.value);
+    await onChangeSource();
     form.value.refresh = false;
   }
 });
@@ -189,66 +188,56 @@ function handleReset() {
 async function loadData() {
   if (loading.value) return;
   loading.value = true;
-  try {
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/query`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        s: form.value.s,
-        level: form.value.level,
-        range: form.value.range,
-        pageSize: pagination.value.pageSize,
-        pageNo: pagination.value.pageNo,
-        filters: filters.value,
-        filterRelation: filterRelation.value,
-      }),
-    });
-    const data = await res.json();
-    const {
-      list = [],
-      hasNext,
-      hasPrev,
-      pageCount = 1,
-      pageNo = 1,
-      pageSize = 10,
-      total = 0,
-    } = data.data || {};
-    tableData.value = list;
-    pagination.value = {
-      hasNext,
-      hasPrev,
-      pageCount,
-      pageNo,
-      pageSize,
-      total,
-    };
-  } catch (error) {
-    console.error(error);
-    Modal.error({
-      title: "Error",
-      content: typeof error === "string" ? error : JSON.stringify(error),
-    });
+  if (id.value) {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/query`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          s: form.value.s,
+          level: form.value.level,
+          range: form.value.range,
+          pageSize: pagination.value.pageSize,
+          pageNo: pagination.value.pageNo,
+          filters: filters.value,
+          filterRelation: filterRelation.value,
+          id: id.value,
+        }),
+      });
+      const data = await res.json();
+      const {
+        list = [],
+        hasNext,
+        hasPrev,
+        pageCount = 1,
+        pageNo = 1,
+        pageSize = 10,
+        total = 0,
+      } = data.data || {};
+      tableData.value = list;
+      pagination.value = {
+        hasNext,
+        hasPrev,
+        pageCount,
+        pageNo,
+        pageSize,
+        total,
+      };
+    } catch (error) {
+      console.error(error);
+      Modal.error({
+        title: "Error",
+        content: typeof error === "string" ? error : JSON.stringify(error),
+      });
+    }
   }
   loading.value = false;
 }
 
-async function onChangeSource(ev: any) {
+async function onChangeSource() {
   try {
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/logConfig/active`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: ev,
-      }),
-    });
-    const data = await res.json();
-    if (data.code) {
-      throw data.msg;
-    }
     setTagsByConfig();
     setCustomColumnsByConfig();
     await loadData();
@@ -264,7 +253,7 @@ async function onChangeSource(ev: any) {
 function setTagsByConfig() {
   let list: any[] = [];
   let map: Record<string, string> = {};
-  const config = logConfigs.value.find((conf: any) => conf.id === active.value);
+  const config = logConfigs.value.find((conf: any) => conf.id === id.value);
   if (config) {
     list = config.tags || [];
     list.map((tag: any) => {
@@ -275,7 +264,7 @@ function setTagsByConfig() {
   tagsMap.value = map;
 }
 function setCustomColumnsByConfig() {
-  const config = logConfigs.value.find((conf: any) => conf.id === active.value);
+  const config = logConfigs.value.find((conf: any) => conf.id === id.value);
   if (config) {
     customColumns.value = (config.customColumns || []).map((col: any) => {
       col.dataIndex = `message.${col.dataIndex}`;

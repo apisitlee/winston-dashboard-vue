@@ -43,18 +43,15 @@ function streamReadFiles(config: any) {
         });
 }
 
-export async function fileFinder(readStorage: (filename: string) => string, onUpdate: any): Promise<any> {
-    async function find(): Promise<any[]> {
+export async function fileFinderGlobal(storage: any, onUpdate: any): Promise<any> {
+    const listMap: Record<string, any[]> = {};
+    const configList: any[] = storage.readStorageByLine('logs.txt').map((item: string) => JSON.parse(item));
+
+    async function find(config: any): Promise<void> {
         const list: any[] = [];
-        // 读取../storage.local/active文件
-        const active = readStorage('active.txt');
-        if (active === '') return list;
-        // 读取../storage.local/logs文件，获取所有日志源，筛选出当前日志源
-        const configs = readStorage('logs.txt');
-        const config = configs.split('\n').map((item) => JSON.parse(item)).filter((item) => item.id === active).pop() || {};
         try {
             const file = (await streamReadFiles(config)) || '';
-            file.split('\n').map((item, index) => {
+            file.split('\n').map((item) => {
                 if (!item) return;
                 try {
                     const json: any = JSON.parse(item);
@@ -65,22 +62,43 @@ export async function fileFinder(readStorage: (filename: string) => string, onUp
                     list.unshift({ item });
                 }
             });
-            return list;
+            listMap[config.id] = list;
         } catch (e) {
             console.log('stream read file error', e);
-            return list;
+            listMap[config.id] = list;
         }
     }
-    onUpdate(await find());
-    setInterval(async () => {
-        onUpdate(await find());
-    }, 60 * 1000);
-
+    async function loop() {
+        for (let config of configList) {
+            const task = async function () {
+                try {
+                    if (!(config.id in listMap)) {
+                        listMap[config.id] = []
+                    }
+                    await find(config);
+                } catch (e) {
+                    console.log('stream read file error', e);
+                }
+            }
+            await task();
+            onUpdate(config.id, listMap[config.id])
+        }
+    }
     async function flush() {
-        onUpdate(await find());
+        await loop();
+    }
+    function removeById(id: string) {
+        if (id in listMap) {
+            delete listMap[id];
+        }
     }
 
+    setInterval(async () => {
+        await flush();
+    }, 60 * 1000);
+
     return {
-        flush
+        flush,
+        removeById,
     }
 }

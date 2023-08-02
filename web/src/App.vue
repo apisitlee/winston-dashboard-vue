@@ -35,7 +35,7 @@ const { logConfigs } = useLogConfig();
         <span>Log Dashboard</span>
       </h3>
       <router-link :class="{ 'menu-item': true, active: isActive(item.path) }" v-for="item in menu" :to="item.path">
-        <component :is="item.icon" />
+        <component :is="item.icon" style="width: 1em; height: 1em" />
         <span>{{ item.title }}</span>
       </router-link>
     </aside>

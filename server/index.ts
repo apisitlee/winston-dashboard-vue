@@ -3,7 +3,7 @@ import Koa from 'koa';
 import Router from 'koa-router';
 import bodyParser from 'koa-bodyparser';
 import serve from 'koa-static';
-import { fileFinder } from './utils/FileFinderUtils.js';
+import { fileFinderGlobal } from './utils/FileFinderUtils.js';
 import path from 'path';
 import setupStorage from './utils/StorageUtils.js';
 import type { WinstonDashboardServerConfig } from './index.d.js';
@@ -17,14 +17,19 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
     const router = new Router();
 
     // 本地存储
-    const { readStorage, readStorageByLine, writeStorage, appendStorage } = setupStorage({
+    const storage = setupStorage({
         storageDir: path.resolve(process.cwd(), config.storageDir || 'storage.local')
     });
+    const { readStorage, readStorageByLine, writeStorage, appendStorage } = storage;
 
+    let listMap: Record<string, any[]> = {};
     let list: any[] = [];
-    const { flush } = await fileFinder(readStorage, (data: any[]) => {
-        list = data;
-    });
+    const { flush, removeById: removeFileFinderCacheById } = await fileFinderGlobal(storage, ((id: string, data: any[]) => {
+        if (!(id in listMap)) {
+            listMap[id] = []
+        }
+        listMap[id] = data;
+    }));
 
     // 使用static托管web页面
     app.use(serve(path.resolve(__dirname, '../../web/')));
@@ -87,6 +92,8 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
             const content = list.map((item) => JSON.stringify(item)).join('\n');
             // 覆写
             writeStorage('logs.txt', content + '\n');
+            // 删除该日志在内存中的缓存
+            removeFileFinderCacheById(id);
             ctx.body = {
                 code: 0,
                 msg: '删除成功'
@@ -163,59 +170,11 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
         }
     });
 
-    // 设置监控日志源
-    router.post('/api/logConfig/active', async (ctx: any) => {
-        const { body } = ctx.request;
-        const { id } = body || {};
-        if (!id) {
-            ctx.body = {
-                code: 2,
-                msg: '参数错误'
-            };
-            return;
-        }
-        try {
-            // 将配置id写入../storage.local/active文件
-            writeStorage('active.txt', id);
-            ctx.body = {
-                code: 0,
-                msg: '设置成功'
-            };
-            flush();
-        } catch (e) {
-            console.log(e);
-            ctx.body = {
-                code: 1,
-                msg: '设置失败：\n' + JSON.stringify({ error: e })
-            };
-            return;
-        }
-    });
-
-    // 查询active日志源
-    router.get('/api/logConfig/active', async (ctx: any) => {
-        try {
-            // 读取../storage.local/active文件
-            const id = readStorage('active.txt');
-            ctx.body = {
-                code: 0,
-                msg: '成功',
-                data: id,
-            };
-        } catch (e) {
-            ctx.body = {
-                code: 1,
-                msg: '获取失败：\n' + JSON.stringify({ error: e })
-            };
-            return;
-        }
-    });
-
     // 查询日志
     router.post('/api/query', async (ctx: any) => {
         try {
             const { body } = ctx.request;
-            let { level, s, pageNo = 1, pageSize = 10, range = [], refresh = false, filters = [], filterRelation = '所有' } = body || {};
+            let { level, s, pageNo = 1, pageSize = 10, range = [], refresh = false, filters = [], filterRelation = '所有', id } = body || {};
             pageNo = parseInt(pageNo);
             pageSize = parseInt(pageSize);
             let [startTime, endTime] = range;
@@ -244,7 +203,7 @@ export async function WinstonDashboardServer(config: WinstonDashboardServerConfi
                     return getObjectValue(item, dataIndex);
                 }
             }
-            let result = list.filter(item => {
+            let result = (listMap[id] || []).filter(item => {
                 if (level && item.level !== level) return false;
                 if (s) {
                     if (typeof item.message === 'string' && !(item.message).includes(s)) return false;
