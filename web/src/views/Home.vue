@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="id">
     <a-spin :loading="loading" style="width: calc(100vw - 302px)">
       <div style="margin: 0 0 12px 0">
         <a-space>
@@ -41,6 +41,15 @@
         :page-size-options="[10, 20, 50, 100]" show-total show-jumper show-page-size @change="loadData"
         @page-size-change="loadData" />
     </div>
+  </div>
+  <div v-if="!id">
+    <a-result status="403" subtitle="欢迎使用Log Dashboard.">
+      <template #extra>
+        <a-space>
+          <RouterLink to="/config"><a-button type="primary">添加日志配置</a-button></RouterLink>
+        </a-space>
+      </template>
+    </a-result>
   </div>
   <DetailModal ref="detailModalRef" />
   <a-back-top />
