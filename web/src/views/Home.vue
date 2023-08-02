@@ -250,11 +250,11 @@ async function loadData() {
   loading.value = false;
 }
 
-async function getActive() {
-  const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/logConfig/active`);
-  const { data } = await res.json();
-  active.value = data;
-}
+// async function getActive() {
+//   const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/logConfig/active`);
+//   const { data } = await res.json();
+//   active.value = data;
+// }
 
 async function onChangeSource(ev: any) {
   try {
