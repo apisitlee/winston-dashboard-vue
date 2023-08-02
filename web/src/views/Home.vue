@@ -63,8 +63,9 @@ import DetailModal from "./components/DetailModal.vue";
 import { IconRefresh } from "@arco-design/web-vue/es/icon";
 import FilterPanel from "../components/FilterPanel.vue";
 import { useRoute } from "vue-router";
+import { useLogConfig } from "../composables/useLogConfig";
 
-const logConfigs = ref<any>([]);
+const { logConfigs } = useLogConfig();
 const tableData = ref<any>([]);
 const columnsBefore = ref([
   { title: "#", dataIndex: "_index", slotName: "_index", width: 60, fixed: "left" },
