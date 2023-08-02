@@ -1,13 +1,6 @@
 <template>
   <div>
     <a-spin :loading="loading" style="width: calc(100vw - 302px)">
-      <!-- <div>
-        <a-radio-group v-model="active" type="button" @change="onChangeSource">
-          <a-radio :value="config.id" v-for="config in logConfigs">
-            {{ config.name }}
-          </a-radio>
-        </a-radio-group>
-      </div> -->
       <div style="margin: 0 0 12px 0">
         <a-space>
           <FilterPanel :filters="filters" :relation="filterRelation" :columns="columns" :tags="tagsDef"
@@ -49,7 +42,6 @@
         @page-size-change="loadData" />
     </div>
   </div>
-  {{ id }}
   <DetailModal ref="detailModalRef" />
   <a-back-top />
 </template>
@@ -150,7 +142,7 @@ watch(id, () => {
 });
 
 onMounted(async () => {
-  await getActive();
+  // await getActive();
   await loadData();
   setTagsByConfig();
   setCustomColumnsByConfig();
@@ -184,27 +176,27 @@ function handleReset() {
   loadData();
 }
 
-async function loadLogConfigs() {
-  try {
-    const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/logConfig/list`, {
-      method: "GET",
-    });
-    const data = await res.json();
-    logConfigs.value = data.data || [];
-  } catch (error) {
-    console.error(error);
-    Modal.error({
-      title: "Error",
-      content: typeof error === "string" ? error : JSON.stringify(error),
-    });
-  }
-}
+// async function loadLogConfigs() {
+//   try {
+//     const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/logConfig/list`, {
+//       method: "GET",
+//     });
+//     const data = await res.json();
+//     logConfigs.value = data.data || [];
+//   } catch (error) {
+//     console.error(error);
+//     Modal.error({
+//       title: "Error",
+//       content: typeof error === "string" ? error : JSON.stringify(error),
+//     });
+//   }
+// }
 
 async function loadData() {
   if (loading.value) return;
   loading.value = true;
   try {
-    await loadLogConfigs();
+    // await loadLogConfigs();
     const res = await fetch(`${import.meta.env.VITE_BASE_URL}api/query`, {
       method: "POST",
       headers: {
