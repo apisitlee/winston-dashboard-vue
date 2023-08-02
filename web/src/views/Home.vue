@@ -1,13 +1,13 @@
 <template>
   <div>
-    <a-spin :loading="loading" style="width: 100%">
-      <div>
+    <a-spin :loading="loading" style="width: calc(100vw - 302px)">
+      <!-- <div>
         <a-radio-group v-model="active" type="button" @change="onChangeSource">
           <a-radio :value="config.id" v-for="config in logConfigs">
             {{ config.name }}
           </a-radio>
         </a-radio-group>
-      </div>
+      </div> -->
       <div style="margin: 0 0 12px 0">
         <a-space>
           <FilterPanel :filters="filters" :relation="filterRelation" :columns="columns" :tags="tagsDef"
@@ -49,17 +49,19 @@
         @page-size-change="loadData" />
     </div>
   </div>
+  {{ id }}
   <DetailModal ref="detailModalRef" />
   <a-back-top />
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed, ComputedRef } from "vue";
+import { onMounted, ref, computed, ComputedRef, watch } from "vue";
 import { Modal } from "@arco-design/web-vue";
 // @ts-ignore
 import DetailModal from "./components/DetailModal.vue";
 import { IconRefresh } from "@arco-design/web-vue/es/icon";
 import FilterPanel from "../components/FilterPanel.vue";
+import { useRoute } from "vue-router";
 
 const logConfigs = ref<any>([]);
 const tableData = ref<any>([]);
@@ -138,6 +140,14 @@ const active = ref("");
 const tagsDef = ref<any>([]);
 const tagsMap = ref<any>({});
 const detailModalRef = ref();
+const route = useRoute();
+const id = computed(() => route.params.logConfigId);
+
+watch(id, () => {
+  if (id.value) {
+    onChangeSource(id.value);
+  }
+});
 
 onMounted(async () => {
   await getActive();
