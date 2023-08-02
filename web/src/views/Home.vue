@@ -310,7 +310,6 @@ function onClickItem(record: any, index: number) {
   padding: 12px;
   z-index: 100;
   box-sizing: border-box;
-  border-top: 1px solid #dddddd;
 }
 </style>
 
